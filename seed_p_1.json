@@ -1,0 +1,212 @@
+{
+  "partitions": [
+    {
+      "id": "showcase-main",
+      "slug": "showcase-main",
+      "name": "Main Showcase",
+      "description": "Curated apps, tools, and experiments that represent my current capabilities.",
+      "sortOrder": 1
+    },
+    {
+      "id": "peer-support",
+      "slug": "peer-support",
+      "name": "Peer Support & Mental Health",
+      "description": "Tools and prototypes aligned with peer support, mental health, and lived-experience work.",
+      "sortOrder": 2
+    },
+    {
+      "id": "experiments",
+      "slug": "experiments",
+      "name": "Experiments & R&D",
+      "description": "Experimental projects, prototypes, and technical explorations.",
+      "sortOrder": 3
+    },
+    {
+      "id": "writing",
+      "slug": "writing",
+      "name": "Writing & Narrative",
+      "description": "Narrative projects and writing-focused work.",
+      "sortOrder": 4
+    }
+  ],
+  "projects": [
+    {
+      "id": "notes-phoneline",
+      "slug": "notes-phoneline",
+      "name": "notes-phoneline",
+      "tagline": "",
+      "shortDescription": "",
+      "longDescription": "",
+      "status": "live",
+      "primaryRepoUrl": "https://github.com/DRCUOA/notes-phoneline",
+      "liveUrl": "",
+      "githubRepoFullName": "DRCUOA/notes-phoneline",
+      "createdAt": "2025-11-12T07:30:09Z",
+      "updatedAt": "2025-11-12T07:30:13Z",
+      "inPortfolio": true
+    },
+    {
+      "id": "gallarear",
+      "slug": "gallarear",
+      "name": "gallarear",
+      "tagline": "",
+      "shortDescription": "",
+      "longDescription": "",
+      "status": "live",
+      "primaryRepoUrl": "https://github.com/DRCUOA/gallarear",
+      "liveUrl": "",
+      "githubRepoFullName": "DRCUOA/gallarear",
+      "createdAt": "2025-11-09T00:57:03Z",
+      "updatedAt": "2025-11-09T00:57:06Z",
+      "inPortfolio": true
+    },
+    {
+      "id": "tutorone",
+      "slug": "tutorone",
+      "name": "tutorone",
+      "tagline": "",
+      "shortDescription": "",
+      "longDescription": "",
+      "status": "live",
+      "primaryRepoUrl": "https://github.com/DRCUOA/tutorone",
+      "liveUrl": "",
+      "githubRepoFullName": "DRCUOA/tutorone",
+      "createdAt": "2025-11-03T03:39:13Z",
+      "updatedAt": "2025-11-03T03:39:17Z",
+      "inPortfolio": true
+    },
+    {
+      "id": "rambulations",
+      "slug": "rambulations",
+      "name": "rambulations",
+      "tagline": "",
+      "shortDescription": "",
+      "longDescription": "",
+      "status": "live",
+      "primaryRepoUrl": "https://github.com/DRCUOA/rambulations",
+      "liveUrl": "",
+      "githubRepoFullName": "DRCUOA/rambulations",
+      "createdAt": "2025-10-31T22:55:49Z",
+      "updatedAt": "2025-10-31T22:55:52Z",
+      "inPortfolio": true
+    },
+    {
+      "id": "simples",
+      "slug": "simples",
+      "name": "simples",
+      "tagline": "",
+      "shortDescription": "",
+      "longDescription": "",
+      "status": "live",
+      "primaryRepoUrl": "https://github.com/DRCUOA/simples",
+      "liveUrl": "",
+      "githubRepoFullName": "DRCUOA/simples",
+      "createdAt": "2025-10-24T20:41:07Z",
+      "updatedAt": "2025-10-24T20:41:11Z",
+      "inPortfolio": true
+    },
+    {
+      "id": "local-RAG_withGUI",
+      "slug": "local-RAG_withGUI",
+      "name": "local-RAG_withGUI",
+      "tagline": "",
+      "shortDescription": "",
+      "longDescription": "",
+      "status": "live",
+      "primaryRepoUrl": "https://github.com/DRCUOA/local-RAG_withGUI",
+      "liveUrl": "",
+      "githubRepoFullName": "DRCUOA/local-RAG_withGUI",
+      "createdAt": "2025-10-19T22:24:23Z",
+      "updatedAt": "2025-10-19T22:24:27Z",
+      "inPortfolio": true
+    },
+    {
+      "id": "schemad_1",
+      "slug": "schemad_1",
+      "name": "schemad_1",
+      "tagline": "",
+      "shortDescription": "schema diary-journally app",
+      "longDescription": "",
+      "status": "live",
+      "primaryRepoUrl": "https://github.com/DRCUOA/schemad_1",
+      "liveUrl": "",
+      "githubRepoFullName": "DRCUOA/schemad_1",
+      "createdAt": "2025-09-04T20:53:31Z",
+      "updatedAt": "2025-09-04T20:53:34Z",
+      "inPortfolio": true
+    },
+    {
+      "id": "om-proto",
+      "slug": "om-proto",
+      "name": "om-proto",
+      "tagline": "",
+      "shortDescription": "",
+      "longDescription": "",
+      "status": "prototype",
+      "primaryRepoUrl": "https://github.com/DRCUOA/om-proto",
+      "liveUrl": "",
+      "githubRepoFullName": "DRCUOA/om-proto",
+      "createdAt": "2025-06-05T02:12:41Z",
+      "updatedAt": "2025-06-05T02:12:17Z",
+      "inPortfolio": true
+    },
+    {
+      "id": "gem1",
+      "slug": "gem1",
+      "name": "gem1",
+      "tagline": "",
+      "shortDescription": "",
+      "longDescription": "",
+      "status": "prototype",
+      "primaryRepoUrl": "https://github.com/DRCUOA/gem1",
+      "liveUrl": "",
+      "githubRepoFullName": "DRCUOA/gem1",
+      "createdAt": "2025-05-18T21:45:22Z",
+      "updatedAt": "2025-05-18T07:01:59Z",
+      "inPortfolio": true
+    },
+    {
+      "id": "westMind",
+      "slug": "westMind",
+      "name": "westMind",
+      "tagline": "",
+      "shortDescription": "",
+      "longDescription": "",
+      "status": "prototype",
+      "primaryRepoUrl": "https://github.com/DRCUOA/westMind",
+      "liveUrl": "",
+      "githubRepoFullName": "DRCUOA/westMind",
+      "createdAt": "2025-01-30T06:50:58Z",
+      "updatedAt": "2025-01-30T06:51:02Z",
+      "inPortfolio": true
+    }
+  ],
+  "projectPartitions": [
+    { "projectId": "notes-phoneline", "partitionId": "showcase-main", "isFeatured": true, "sortOrder": 1 },
+    { "projectId": "notes-phoneline", "partitionId": "peer-support", "isFeatured": true, "sortOrder": 1 },
+
+    { "projectId": "gallarear", "partitionId": "showcase-main", "isFeatured": false, "sortOrder": 2 },
+    { "projectId": "gallarear", "partitionId": "experiments", "isFeatured": false, "sortOrder": 5 },
+
+    { "projectId": "tutorone", "partitionId": "showcase-main", "isFeatured": true, "sortOrder": 3 },
+
+    { "projectId": "rambulations", "partitionId": "showcase-main", "isFeatured": true, "sortOrder": 4 },
+    { "projectId": "rambulations", "partitionId": "writing", "isFeatured": true, "sortOrder": 1 },
+
+    { "projectId": "simples", "partitionId": "showcase-main", "isFeatured": true, "sortOrder": 5 },
+
+    { "projectId": "local-RAG_withGUI", "partitionId": "showcase-main", "isFeatured": true, "sortOrder": 6 },
+    { "projectId": "local-RAG_withGUI", "partitionId": "experiments", "isFeatured": true, "sortOrder": 1 },
+
+    { "projectId": "schemad_1", "partitionId": "showcase-main", "isFeatured": true, "sortOrder": 7 },
+    { "projectId": "schemad_1", "partitionId": "peer-support", "isFeatured": true, "sortOrder": 2 },
+
+    { "projectId": "om-proto", "partitionId": "peer-support", "isFeatured": false, "sortOrder": 3 },
+    { "projectId": "om-proto", "partitionId": "experiments", "isFeatured": true, "sortOrder": 2 },
+
+    { "projectId": "gem1", "partitionId": "experiments", "isFeatured": false, "sortOrder": 3 },
+
+    { "projectId": "westMind", "partitionId": "peer-support", "isFeatured": true, "sortOrder": 4 },
+    { "projectId": "westMind", "partitionId": "experiments", "isFeatured": false, "sortOrder": 4 }
+  ]
+}

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.db
+*.db-journal
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
