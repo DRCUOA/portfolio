@@ -28,6 +28,7 @@
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Name</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">NSFW</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Description</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Created</th>
               <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Actions</th>
@@ -35,7 +36,12 @@
           </thead>
           <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
             <tr v-for="project in projects" :key="project.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-200 transition-colors">{{ project.name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-200 transition-colors">
+                <div class="flex items-center gap-2">
+                  {{ project.name }}
+                  <span v-if="project.nsfw" class="text-red-500" title="NSFW Content">⚠️</span>
+                </div>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
                   :class="{
@@ -46,6 +52,20 @@
                   class="px-2 py-1 text-xs font-semibold rounded transition-colors"
                 >
                   {{ project.status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  v-if="project.nsfw"
+                  class="px-2 py-1 text-xs font-semibold rounded bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-700 transition-colors"
+                >
+                  NSFW
+                </span>
+                <span
+                  v-else
+                  class="px-2 py-1 text-xs font-semibold rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 transition-colors"
+                >
+                  Safe
                 </span>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 transition-colors">{{ project.shortDescription || '-' }}</td>

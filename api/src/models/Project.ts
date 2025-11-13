@@ -14,6 +14,7 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
   inPortfolio: number;
+  nsfw: number;
 }
 
 export interface CreateProjectInput {
@@ -28,6 +29,7 @@ export interface CreateProjectInput {
   liveUrl?: string;
   githubRepoFullName?: string;
   inPortfolio?: boolean;
+  nsfw?: boolean;
 }
 
 export interface UpdateProjectInput {
@@ -40,6 +42,7 @@ export interface UpdateProjectInput {
   liveUrl?: string;
   githubRepoFullName?: string;
   inPortfolio?: boolean;
+  nsfw?: boolean;
 }
 
 export class ProjectModel {
@@ -65,8 +68,8 @@ export class ProjectModel {
       INSERT INTO projects (
         id, slug, name, tagline, shortDescription, longDescription,
         status, primaryRepoUrl, liveUrl, githubRepoFullName,
-        createdAt, updatedAt, inPortfolio
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        createdAt, updatedAt, inPortfolio, nsfw
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     stmt.run(
       data.id,
@@ -81,7 +84,8 @@ export class ProjectModel {
       data.githubRepoFullName || null,
       now,
       now,
-      data.inPortfolio === false ? 0 : 1
+      data.inPortfolio === false ? 0 : 1,
+      data.nsfw === true ? 1 : 0
     );
     return this.findById(data.id)!;
   }
@@ -127,6 +131,10 @@ export class ProjectModel {
       updates.push('inPortfolio = ?');
       values.push(data.inPortfolio ? 1 : 0);
     }
+    if (data.nsfw !== undefined) {
+      updates.push('nsfw = ?');
+      values.push(data.nsfw ? 1 : 0);
+    }
 
     if (updates.length === 0) {
       return this.findById(id) || null;
@@ -146,4 +154,5 @@ export class ProjectModel {
     return result.changes > 0;
   }
 }
+
 

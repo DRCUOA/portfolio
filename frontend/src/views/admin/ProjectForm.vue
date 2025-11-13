@@ -90,16 +90,82 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">
             Screenshots (for App Store View)
           </label>
-          <textarea
-            v-model="screenshotsInput"
-            rows="6"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
-            placeholder="Enter screenshot URLs or local paths, one per line:&#10;&#10;Local files (place in frontend/public/screenshots/):&#10;/screenshots/project-name/img1.png&#10;/screenshots/project-name/img2.png&#10;&#10;Remote URLs:&#10;https://example.com/screenshot1.png"
-          />
-          <p class="mt-1 text-sm text-gray-500">
-            <strong>Local files:</strong> Place images in <code class="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded">frontend/public/screenshots/</code> and use paths like <code class="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded">/screenshots/project-name/image.png</code><br>
-            <strong>Remote URLs:</strong> Use full URLs like <code class="bg-gray-100 dark:bg-slate-800 px-1 py-0.5 rounded">https://example.com/image.png</code>
-          </p>
+          
+          <!-- File Upload Section -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Upload Images
+            </label>
+            <div class="flex items-center gap-4">
+              <input
+                ref="fileInput"
+                type="file"
+                accept="image/*"
+                multiple
+                @change="handleFileSelect"
+                class="hidden"
+              />
+              <button
+                type="button"
+                @click="fileInput?.click()"
+                :disabled="uploading"
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              >
+                {{ uploading ? 'Uploading...' : 'Choose Files' }}
+              </button>
+              <span v-if="uploading" class="text-sm text-gray-600">
+                Uploading {{ uploadProgress }}...
+              </span>
+            </div>
+            <p class="mt-1 text-sm text-gray-500">
+              Select one or more image files to upload. Files will be organized by project slug.
+            </p>
+          </div>
+
+          <!-- Screenshot Previews -->
+          <div v-if="screenshotPreviews.length > 0" class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Uploaded Screenshots
+            </label>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div
+                v-for="(screenshot, index) in screenshotPreviews"
+                :key="index"
+                class="relative group"
+              >
+                <img
+                  :src="getScreenshotUrl(screenshot)"
+                  :alt="`Screenshot ${index + 1}`"
+                  class="w-full h-32 object-cover rounded-md border border-gray-300"
+                  @error="handleImageError"
+                />
+                <button
+                  type="button"
+                  @click="removeScreenshot(index)"
+                  class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Remove screenshot"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Manual URL Input -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Or Enter URLs Manually
+            </label>
+            <textarea
+              v-model="screenshotsInput"
+              rows="4"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+              placeholder="Enter screenshot URLs or local paths, one per line:&#10;&#10;Local paths:&#10;/screenshots/project-name/img1.png&#10;&#10;Remote URLs:&#10;https://example.com/screenshot1.png"
+            />
+            <p class="mt-1 text-sm text-gray-500">
+              Enter image URLs or paths, one per line. Uploaded images above will be added automatically.
+            </p>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -128,6 +194,34 @@
               <option :value="false">No</option>
             </select>
           </div>
+        </div>
+
+        <div class="mb-6 p-4 rounded-lg border-2" :class="form.nsfw ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700' : 'bg-gray-50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700'">
+          <label class="flex items-start gap-4 cursor-pointer">
+            <div class="flex-shrink-0 mt-1">
+              <input
+                v-model="form.nsfw"
+                type="checkbox"
+                class="h-6 w-6 text-red-600 dark:text-red-400 focus:ring-red-500 dark:focus:ring-red-400 border-gray-300 dark:border-slate-600 rounded transition-colors cursor-pointer"
+              />
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-base font-semibold" :class="form.nsfw ? 'text-red-700 dark:text-red-300' : 'text-gray-700 dark:text-slate-300'">
+                  NSFW Content
+                </span>
+                <span
+                  v-if="form.nsfw"
+                  class="px-2 py-0.5 text-xs font-semibold rounded bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200"
+                >
+                  Active
+                </span>
+              </div>
+              <p class="text-sm" :class="form.nsfw ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-slate-400'">
+                Mark this project as containing content that may be offensive or inappropriate for users under 18 or sensitive viewers. When enabled, users will see a warning modal before viewing the project.
+              </p>
+            </div>
+          </label>
         </div>
 
         <div class="mb-6">
@@ -275,12 +369,17 @@ const form = ref<CreateProjectInput>({
   liveUrl: '',
   githubRepoFullName: '',
   inPortfolio: true,
+  nsfw: false,
 })
 
 const screenshotsInput = ref('')
 const loading = ref(false)
 const loadingPartitions = ref(false)
 const error = ref<string | null>(null)
+const fileInput = ref<HTMLInputElement | null>(null)
+const uploading = ref(false)
+const uploadProgress = ref('')
+const screenshotPreviews = ref<string[]>([])
 
 const availablePartitions = ref<Array<{ id: string; name: string; description: string; sortOrder: number }>>([])
 const selectedPartitions = ref<string[]>([])
@@ -335,6 +434,7 @@ onMounted(async () => {
         }
         
         screenshotsInput.value = screenshots.join('\n')
+        screenshotPreviews.value = screenshots
         
         form.value = {
           id: project.id,
@@ -348,6 +448,7 @@ onMounted(async () => {
           liveUrl: project.liveUrl,
           githubRepoFullName: project.githubRepoFullName,
           inPortfolio: project.inPortfolio,
+          nsfw: project.nsfw || false,
         }
         
         // Load current project partitions
@@ -372,6 +473,21 @@ onMounted(async () => {
   }
 })
 
+// Sync screenshotPreviews with screenshotsInput
+watch(screenshotsInput, (newValue) => {
+  const screenshots = newValue
+    .split('\n')
+    .map(url => url.trim())
+    .filter(url => url.length > 0)
+  
+  // Only update previews if they're different (to avoid loops)
+  const currentPreviews = screenshotPreviews.value.join('\n')
+  const newPreviews = screenshots.join('\n')
+  if (currentPreviews !== newPreviews) {
+    screenshotPreviews.value = screenshots
+  }
+})
+
 // Initialize default settings when a partition is selected
 watch(selectedPartitions, (newSelection) => {
   // For newly selected partitions, initialize default settings if not already set
@@ -385,21 +501,136 @@ watch(selectedPartitions, (newSelection) => {
   })
 }, { deep: true })
 
+// Handle file selection and upload
+async function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  const files = target.files
+  
+  if (!files || files.length === 0) return
+  
+  uploading.value = true
+  uploadProgress.value = ''
+  
+  try {
+    const uploadedPaths: string[] = []
+    const projectSlug = form.value.slug || 'uploads'
+    
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      uploadProgress.value = `${i + 1}/${files.length}`
+      
+      try {
+        const path = await store.uploadScreenshot(file, projectSlug)
+        uploadedPaths.push(path)
+      } catch (err) {
+        console.error(`Failed to upload ${file.name}:`, err)
+        error.value = `Failed to upload ${file.name}. ${err instanceof Error ? err.message : 'Unknown error'}`
+      }
+    }
+    
+    // Add uploaded paths to screenshots
+    const currentScreenshots = screenshotPreviews.value
+    const allScreenshots = [...currentScreenshots, ...uploadedPaths]
+    screenshotPreviews.value = allScreenshots
+    screenshotsInput.value = allScreenshots.join('\n')
+    
+    // Reset file input
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to upload files'
+  } finally {
+    uploading.value = false
+    uploadProgress.value = ''
+  }
+}
+
+// Get full URL for screenshot display
+function getScreenshotUrl(path: string): string {
+  // If it's already a full URL, return as-is
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path
+  }
+  
+  // If it starts with /, it's a local path
+  // In development, Vite serves files from public folder, so relative paths work
+  // In production, we may need to construct full URLs
+  if (path.startsWith('/')) {
+    // Check if we're in development (Vite serves public folder)
+    if (import.meta.env.DEV) {
+      // In development, Vite serves /screenshots/ directly from public folder
+      return path
+    } else {
+      // In production, construct URL using API base (backend serves static files)
+      const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
+      const baseUrl = apiBase.replace('/api', '')
+      return `${baseUrl}${path}`
+    }
+  }
+  
+  // Otherwise, prepend / and use relative path
+  return `/${path}`
+}
+
+// Remove screenshot from list
+function removeScreenshot(index: number) {
+  const screenshot = screenshotPreviews.value[index]
+  
+  // If it's an uploaded file (starts with /screenshots/), try to delete it
+  if (screenshot.startsWith('/screenshots/')) {
+    store.deleteScreenshot(screenshot).catch(err => {
+      console.error('Failed to delete file:', err)
+      // Continue with removal from UI even if server deletion fails
+    })
+  }
+  
+  screenshotPreviews.value.splice(index, 1)
+  screenshotsInput.value = screenshotPreviews.value.join('\n')
+}
+
+// Handle image load errors
+function handleImageError(event: Event) {
+  const img = event.target as HTMLImageElement
+  img.style.display = 'none'
+}
+
+// Helper to normalize screenshot paths - ensure we store relative paths, not full URLs
+function normalizeScreenshotPath(path: string): string {
+  // If it's a full URL, extract just the path part
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    try {
+      const url = new URL(path)
+      return url.pathname
+    } catch {
+      // If URL parsing fails, return as-is
+      return path
+    }
+  }
+  // If it's already a relative path, return as-is
+  return path
+}
+
 async function handleSubmit() {
   error.value = null
   try {
-    // Parse screenshots from input
-    const screenshots = screenshotsInput.value
-      .split('\n')
-      .map(url => url.trim())
-      .filter(url => url.length > 0)
+    // Use screenshotPreviews if available, otherwise parse from input
+    const screenshots = screenshotPreviews.value.length > 0
+      ? screenshotPreviews.value
+      : screenshotsInput.value
+          .split('\n')
+          .map(url => url.trim())
+          .filter(url => url.length > 0)
+    
+    // Normalize all screenshot paths to ensure we store relative paths, not full URLs
+    const normalizedScreenshots = screenshots.map(normalizeScreenshotPath)
     
     // Combine description and screenshots into JSON if screenshots exist
     let longDescription = form.value.longDescription
-    if (screenshots.length > 0) {
+    if (normalizedScreenshots.length > 0) {
       longDescription = JSON.stringify({
         description: form.value.longDescription,
-        screenshots: screenshots
+        screenshots: normalizedScreenshots
       })
     }
     
@@ -416,6 +647,7 @@ async function handleSubmit() {
         liveUrl: form.value.liveUrl,
         githubRepoFullName: form.value.githubRepoFullName,
         inPortfolio: form.value.inPortfolio,
+        nsfw: form.value.nsfw,
       }
       await store.updateProject(projectId, updateData)
       savedProjectId = projectId

@@ -21,8 +21,43 @@
         <p class="text-red-100 font-medium">Error: {{ store.error }}</p>
       </div>
       
+      <!-- NSFW Warning Modal -->
+      <div
+        v-if="project && project.nsfw && !nsfwAccepted"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+        @click.self="showNsfwWarning = false"
+      >
+        <div class="glass-strong rounded-3xl p-8 max-w-md w-full border-2 border-red-500/50">
+          <div class="text-center mb-6">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
+              <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white dark:text-slate-300 mb-2">Content Warning</h2>
+            <p class="text-white/80 dark:text-slate-400">
+              This project may contain content that is offensive or inappropriate for users under 18 or sensitive viewers.
+            </p>
+          </div>
+          <div class="flex gap-4">
+            <button
+              @click="$router.push('/')"
+              class="flex-1 px-6 py-3 rounded-2xl bg-gray-600 hover:bg-gray-700 text-white font-semibold transition-colors"
+            >
+              Go Back
+            </button>
+            <button
+              @click="nsfwAccepted = true; showNsfwWarning = false"
+              class="flex-1 px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- App Store View -->
-      <div v-else-if="project" class="fade-in-up">
+      <div v-else-if="project && (!project.nsfw || nsfwAccepted)" class="fade-in-up">
         <!-- Hero Section -->
         <div class="glass-strong rounded-3xl p-8 md:p-12 mb-8">
           <div class="flex flex-col md:flex-row gap-8 items-start">
@@ -35,8 +70,19 @@
             
             <!-- App Info -->
             <div class="flex-1">
-              <h1 class="text-4xl md:text-5xl font-bold text-white dark:text-slate-300 mb-2 transition-colors">{{ project.name }}</h1>
-                      <p v-if="project.tagline" class="text-white/60 dark:text-slate-500 text-xl font-light mb-4 transition-colors">{{ project.tagline }}</p>
+              <div class="flex items-start justify-between mb-2">
+                <h1 class="text-4xl md:text-5xl font-bold text-white dark:text-slate-300 transition-colors">{{ project.name }}</h1>
+                <span
+                  v-if="project.nsfw"
+                  class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-500/30 text-red-100 border border-red-400/30 backdrop-blur-sm flex items-center gap-1.5 flex-shrink-0 ml-4"
+                >
+                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  NSFW
+                </span>
+              </div>
+              <p v-if="project.tagline" class="text-white/60 dark:text-slate-500 text-xl font-light mb-4 transition-colors">{{ project.tagline }}</p>
               
               <!-- Action Buttons -->
               <div class="flex flex-wrap gap-4 mt-6">
@@ -195,6 +241,7 @@
                     :alt="`${project.name} screenshot ${index + 1}`"
                     class="w-full h-auto object-cover"
                     @error="handleImageError"
+                    loading="lazy"
                   />
                 </div>
               </div>
@@ -322,6 +369,35 @@ const project = ref<ProjectDetail | null>(null)
 const screenshotContainer = ref<HTMLElement | null>(null)
 const currentScreenshot = ref(0)
 const iframeError = ref(false)
+const showNsfwWarning = ref(false)
+const nsfwAccepted = ref(false)
+
+// Helper function to convert screenshot paths to full URLs
+function getScreenshotUrl(path: string): string {
+  // If it's already a full URL, return as-is
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path
+  }
+  
+  // If it starts with /, it's a local path
+  // In development, Vite serves files from public folder, so relative paths work
+  // In production, we may need to construct full URLs
+  if (path.startsWith('/')) {
+    // Check if we're in development (Vite serves public folder)
+    if (import.meta.env.DEV) {
+      // In development, Vite serves /screenshots/ directly from public folder
+      return path
+    } else {
+      // In production, construct URL using API base (backend serves static files)
+      const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
+      const baseUrl = apiBase.replace('/api', '')
+      return `${baseUrl}${path}`
+    }
+  }
+  
+  // Otherwise, prepend / and use relative path
+  return `/${path}`
+}
 
 // Extract screenshots and description from project data
 const screenshots = computed(() => {
@@ -331,7 +407,9 @@ const screenshots = computed(() => {
   try {
     const parsed = JSON.parse(project.value.longDescription || '{}')
     if (parsed.screenshots && Array.isArray(parsed.screenshots)) {
-      return parsed.screenshots.filter((url: string) => url && url.trim().length > 0)
+      return parsed.screenshots
+        .filter((url: string) => url && url.trim().length > 0)
+        .map((url: string) => getScreenshotUrl(url))
     }
   } catch {
     // Not JSON, continue
@@ -347,14 +425,16 @@ const descriptionText = computed(() => {
   // Try to parse description from longDescription if it's JSON
   try {
     const parsed = JSON.parse(project.value.longDescription || '{}')
-    if (parsed.description) {
+    // Only return the description field, ignore screenshots
+    if (parsed.description && parsed.description.trim().length > 0) {
       return parsed.description
     }
+    // If description is empty but JSON exists, return empty string (don't show JSON)
+    return ''
   } catch {
-    // Not JSON, use as-is
+    // Not JSON, use as-is (plain text description)
+    return project.value.longDescription || ''
   }
-  
-  return project.value.longDescription || ''
 })
 
 function formatDate(dateString: string): string {
@@ -373,6 +453,12 @@ function handleImageError(event: Event) {
 onMounted(async () => {
   const slug = route.params.slug as string
   project.value = await store.fetchProjectBySlug(slug)
+  
+  // Show NSFW warning if project is marked as NSFW
+  if (project.value && project.value.nsfw) {
+    showNsfwWarning.value = true
+    nsfwAccepted.value = false
+  }
   
   // Set up screenshot scrolling
   if (screenshotContainer.value && screenshots.value.length > 0) {

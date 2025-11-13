@@ -41,7 +41,8 @@ function initializeDb(): void {
       githubRepoFullName TEXT,
       createdAt TEXT NOT NULL,
       updatedAt TEXT NOT NULL,
-      inPortfolio INTEGER DEFAULT 1
+      inPortfolio INTEGER DEFAULT 1,
+      nsfw INTEGER DEFAULT 0
     );
 
     CREATE TABLE IF NOT EXISTS project_partitions (
@@ -54,6 +55,18 @@ function initializeDb(): void {
       FOREIGN KEY (partitionId) REFERENCES partitions(id)
     );
   `);
+
+  // Migration: Add nsfw column if it doesn't exist
+  try {
+    db!.exec('ALTER TABLE projects ADD COLUMN nsfw INTEGER DEFAULT 0');
+    // Set all existing projects to nsfw = 0 (false)
+    db!.exec('UPDATE projects SET nsfw = 0 WHERE nsfw IS NULL');
+  } catch (error: any) {
+    // Column already exists, ignore error
+    if (!error.message.includes('duplicate column name')) {
+      console.warn('Migration warning:', error.message);
+    }
+  }
 
   // Check if database is empty
   const partitionCount = db!.prepare('SELECT COUNT(*) as count FROM partitions').get() as { count: number };
@@ -86,8 +99,8 @@ function loadSeedData(): void {
     INSERT INTO projects (
       id, slug, name, tagline, shortDescription, longDescription,
       status, primaryRepoUrl, liveUrl, githubRepoFullName,
-      createdAt, updatedAt, inPortfolio
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      createdAt, updatedAt, inPortfolio, nsfw
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const insertProjectPartition = db!.prepare(`
@@ -122,7 +135,8 @@ function loadSeedData(): void {
         project.githubRepoFullName || null,
         project.createdAt,
         project.updatedAt,
-        project.inPortfolio === true ? 1 : 0
+        project.inPortfolio === true ? 1 : 0,
+        project.nsfw === true ? 1 : 0
       );
     }
 

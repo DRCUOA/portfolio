@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- NSFW content flag for projects with comprehensive warning modal system
+- NSFW toggle in admin ProjectForm with enhanced visual styling and dynamic feedback
+- NSFW warning modal displayed before viewing NSFW projects (AppStoreView and ProjectDetail)
+- NSFW badges and indicators throughout admin panel and project views
+- Image upload functionality for screenshots via API endpoint (`POST /api/upload/screenshot`)
+- Screenshot deletion functionality (`DELETE /api/upload/screenshot`)
+- Screenshot preview grid with remove functionality in ProjectForm
+- File upload progress indicators and error handling
+- Environment variable support for backend API server port configuration
+- Environment variable support for frontend development server port configuration
+- Environment variable support for API base URL in frontend
+- Backend CORS configuration via environment variables (supports multiple origins)
+- Local screenshot support with `/screenshots/` directory in public folder
+- Screenshot usage documentation and examples
+
+### Changed
+- Database schema: Added `nsfw INTEGER DEFAULT 0` column to projects table
+- All existing projects automatically set to `nsfw = false` via migration
+- Backend server now reads PORT from `.env` file (defaults to 3000)
+- Backend CORS origins now configurable via `FRONTEND_URL` environment variable
+- Frontend Vite config now reads port from `VITE_PORT` environment variable
+- Frontend API base URL now reads from `VITE_API_BASE_URL` environment variable
+- ProjectForm screenshot input now supports both file uploads and manual URL entry
+- Screenshot URL handling: Fixed display issues in AppStoreView and ProjectDetail
+- Description sections now properly extract text from JSON, avoiding raw JSON display
+- Screenshot paths normalized to ensure relative paths are stored (not full URLs)
+
+### Technical Details
+- Added `nsfw INTEGER DEFAULT 0` column to projects table with automatic migration
+- Added `multer` package for file upload handling
+- Created upload controller (`UploadController.ts`) and routes (`uploadRoutes.ts`)
+- Static file serving configured for uploaded screenshots
+- Screenshot path normalization function to extract relative paths from full URLs
+- Added `dotenv` package to backend dependencies
+- Created `/api/.env` with `PORT` and `FRONTEND_URL` configuration
+- Created `/frontend/.env` with `VITE_PORT` and `VITE_API_BASE_URL` configuration
+- Updated `.gitignore` files to exclude `.env` files from version control
+- Created `/frontend/public/screenshots/` directory structure for local images
+
+### UI/UX Improvements
+- NSFW warning modal with "Go Back" and "Continue" options
+- NSFW badges in admin ProjectList table with "NSFW" or "Safe" labels
+- NSFW badges on project cards in PartitionDetail view
+- NSFW badges in ProjectDetail and AppStoreView hero sections
+- Enhanced NSFW toggle in ProjectForm with visual feedback (red theme when active)
+- Screenshot preview grid with thumbnail images and remove buttons
+- File upload progress indicators during batch uploads
+- Improved error handling and user feedback for uploads
+
 ## [1.0.0] - 2025-01-30 - Initial Release
 
 ### Added
@@ -33,7 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `partitions` table: Categories/sections for organizing projects
   - Fields: id, slug, name, description, sortOrder
 - `projects` table: Individual portfolio projects
-  - Fields: id, slug, name, tagline, shortDescription, longDescription, status, primaryRepoUrl, liveUrl, githubRepoFullName, createdAt, updatedAt, inPortfolio
+  - Fields: id, slug, name, tagline, shortDescription, longDescription, status, primaryRepoUrl, liveUrl, githubRepoFullName, createdAt, updatedAt, inPortfolio, nsfw
 - `project_partitions` table: Many-to-many relationship with featured flag and sort order
   - Fields: projectId, partitionId, isFeatured, sortOrder
   - Foreign key constraints enabled
@@ -52,6 +104,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `POST /api/projects` - Create new project
   - `PUT /api/projects/:id` - Update project
   - `DELETE /api/projects/:id` - Delete project
+
+- **Uploads:**
+  - `POST /api/upload/screenshot` - Upload screenshot image file
+  - `DELETE /api/upload/screenshot` - Delete uploaded screenshot file
 
 - **Project Partitions:**
   - `POST /api/project-partitions` - Create project-partition relationship
@@ -213,15 +269,14 @@ portfolio/
 ### Known Limitations
 - Tailwind CSS loaded via CDN (not recommended for production)
 - No authentication/authorization for admin routes
-- No image upload functionality (screenshots must be manually placed)
 - No markdown rendering in descriptions (plain text only)
 
 ### Future Enhancements
 - Install Tailwind CSS as PostCSS plugin for production
 - Add authentication system for admin routes
-- Implement image upload functionality
 - Add markdown rendering support
 - Add search functionality
 - Add filtering and sorting options
 - Add analytics tracking
 - Add SEO optimization
+- Add image optimization/compression for uploaded screenshots

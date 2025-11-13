@@ -25,6 +25,7 @@ export interface Project {
   createdAt: string
   updatedAt: string
   inPortfolio: boolean
+  nsfw: boolean
 }
 
 export interface ProjectPartition {
@@ -319,6 +320,60 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     }
   }
 
+  // Upload screenshot
+  async function uploadScreenshot(file: File, projectSlug?: string): Promise<string> {
+    loading.value = true
+    error.value = null
+    try {
+      const formData = new FormData()
+      formData.append('image', file)
+      if (projectSlug) {
+        formData.append('projectSlug', projectSlug)
+      }
+
+      const response = await fetch(`${API_BASE_URL}/upload/screenshot`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const err = await response.json()
+        throw new Error(err.error || 'Failed to upload screenshot')
+      }
+
+      const result = await response.json()
+      return result.path
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Delete screenshot
+  async function deleteScreenshot(filePath: string): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload/screenshot`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: filePath }),
+      })
+
+      if (!response.ok) {
+        const err = await response.json()
+        throw new Error(err.error || 'Failed to delete screenshot')
+      }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     partitions,
     loading,
@@ -336,6 +391,8 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     createProjectPartition,
     updateProjectPartition,
     deleteProjectPartition,
+    uploadScreenshot,
+    deleteScreenshot,
   }
 })
 
@@ -365,6 +422,7 @@ export interface CreateProjectInput {
   liveUrl?: string
   githubRepoFullName?: string
   inPortfolio?: boolean
+  nsfw?: boolean
 }
 
 export interface UpdateProjectInput {
@@ -377,6 +435,7 @@ export interface UpdateProjectInput {
   liveUrl?: string
   githubRepoFullName?: string
   inPortfolio?: boolean
+  nsfw?: boolean
 }
 
 export interface CreateProjectPartitionInput {

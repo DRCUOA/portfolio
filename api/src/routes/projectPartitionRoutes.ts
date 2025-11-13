@@ -12,3 +12,4 @@ router.delete('/:projectId/:partitionId', ProjectPartitionController.delete);
 
 export default router;
 
+

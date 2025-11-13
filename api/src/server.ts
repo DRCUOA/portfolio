@@ -1,10 +1,12 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import * as path from 'path';
 import { getDb, closeDb } from './db';
 import partitionRoutes from './routes/partitionRoutes';
 import projectRoutes from './routes/projectRoutes';
 import projectPartitionRoutes from './routes/projectPartitionRoutes';
+import uploadRoutes from './routes/uploadRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,11 +22,17 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from frontend public directory (for uploaded screenshots)
+const publicDir = path.join(__dirname, '..', '..', 'frontend', 'public');
+app.use('/screenshots', express.static(path.join(publicDir, 'screenshots')));
 
 // API Routes
 app.use('/api/partitions', partitionRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/project-partitions', projectPartitionRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Initialize database connection
 getDb();

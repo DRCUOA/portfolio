@@ -17,6 +17,7 @@ export class ProjectController {
         liveUrl: p.liveUrl || '',
         githubRepoFullName: p.githubRepoFullName || '',
         inPortfolio: p.inPortfolio === 1,
+        nsfw: p.nsfw === 1,
       })));
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -53,6 +54,7 @@ export class ProjectController {
         liveUrl: project.liveUrl || '',
         githubRepoFullName: project.githubRepoFullName || '',
         inPortfolio: project.inPortfolio === 1,
+        nsfw: project.nsfw === 1,
         partitions,
         projectPartitions: projectPartitions.map(pp => ({
           projectId: pp.projectId,
@@ -99,6 +101,7 @@ export class ProjectController {
         liveUrl: project.liveUrl || '',
         githubRepoFullName: project.githubRepoFullName || '',
         inPortfolio: project.inPortfolio === 1,
+        nsfw: project.nsfw === 1,
       });
     } catch (error) {
       console.error('Error creating project:', error);
@@ -133,6 +136,7 @@ export class ProjectController {
         liveUrl: updated.liveUrl || '',
         githubRepoFullName: updated.githubRepoFullName || '',
         inPortfolio: updated.inPortfolio === 1,
+        nsfw: updated.nsfw === 1,
       });
     } catch (error) {
       console.error('Error updating project:', error);
@@ -167,4 +171,5 @@ export class ProjectController {
     }
   }
 }
+
 
