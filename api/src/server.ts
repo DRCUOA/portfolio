@@ -42,7 +42,13 @@ getDb();
 
 // Start server and store the server instance
 const server = app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log('='.repeat(55));
+  console.log('Backend API Server Started');
+  console.log('='.repeat(55));
+  console.log(`Port: ${PORT}`);
+  console.log(`🌐 CORS Origins: ${corsOrigins.join(', ')}`);
+  console.log(` Server URL: http://localhost:${PORT}`);
+  console.log('='.repeat(55));
 });
 
 // Graceful shutdown handler
