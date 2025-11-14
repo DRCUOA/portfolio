@@ -144,8 +144,16 @@ const store = usePortfolioStore()
 const partition = ref<PartitionDetail | null>(null)
 
 onMounted(async () => {
+  // Scroll to top when component mounts
+  window.scrollTo({ top: 0, behavior: 'instant' })
+  
   const slug = route.params.slug as string
   partition.value = await store.fetchPartitionBySlug(slug)
+  
+  // Ensure we're at the top after data loads
+  setTimeout(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, 0)
 })
 </script>
 

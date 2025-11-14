@@ -57,6 +57,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - File upload progress indicators during batch uploads
 - Improved error handling and user feedback for uploads
 
+## [1.0.1] - 2025-01-15
+
+### Fixed
+- Fixed environment variable port configuration mismatch between frontend and backend
+- Updated frontend `.env` to use port 3100 for `VITE_API_BASE_URL` to match backend `PORT` configuration
+- Updated frontend `.env` comment references to reflect correct backend port (3100)
+
+### Changed
+- Frontend API base URL now correctly points to backend port 3100 instead of default 3000
+
 ## [1.0.0] - 2025-01-30 - Initial Release
 
 ### Added

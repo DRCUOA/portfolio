@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import PartitionList from '../views/PartitionList.vue'
 import PartitionDetail from '../views/PartitionDetail.vue'
-import ProjectDetail from '../views/ProjectDetail.vue'
-import AppStoreView from '../views/AppStoreView.vue'
+import ProjectView from '../views/ProjectView.vue'
 import AdminDashboard from '../views/admin/AdminDashboard.vue'
 import AdminPartitionList from '../views/admin/PartitionList.vue'
 import AdminPartitionForm from '../views/admin/PartitionForm.vue'
@@ -26,13 +25,13 @@ const router = createRouter({
     {
       path: '/projects/:slug',
       name: 'project',
-      component: ProjectDetail,
+      component: ProjectView,
       props: true,
     },
     {
       path: '/apps/:slug',
       name: 'app-store',
-      component: AppStoreView,
+      component: ProjectView,
       props: true,
     },
     {
@@ -73,6 +72,14 @@ const router = createRouter({
       props: true,
     },
   ],
+  scrollBehavior(_to, _from, savedPosition) {
+    // Always scroll to top on route change (instant for immediate positioning)
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0, behavior: 'instant' }
+    }
+  },
 })
 
 export default router

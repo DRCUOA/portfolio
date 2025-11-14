@@ -63,7 +63,15 @@ import { usePortfolioStore } from '../stores/portfolio'
 const store = usePortfolioStore()
 
 onMounted(() => {
+  // Scroll to top when component mounts
+  window.scrollTo({ top: 0, behavior: 'instant' })
+  
   store.fetchPartitions()
+  
+  // Ensure we're at the top after data loads
+  setTimeout(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, 0)
 })
 </script>
 

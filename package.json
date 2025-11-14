@@ -1,6 +1,6 @@
 {
   "name": "portfolio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "dev": "concurrently -n \"API,FRONTEND\" -c \"cyan,magenta\" --kill-others-on-fail --kill-others \"npm run dev:api\" \"npm run dev:frontend\"",
     "dev:api": "cd api && npm run dev:api",

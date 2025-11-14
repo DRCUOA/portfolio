@@ -12,3 +12,5 @@ router.delete('/:id', PartitionController.delete);
 export default router;
 
 
+
+
