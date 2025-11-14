@@ -57,6 +57,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - File upload progress indicators during batch uploads
 - Improved error handling and user feedback for uploads
 
+## [1.0.3] - 2025-11-15
+
+### Added
+- Startup console logs for backend API server showing port, CORS origins, and server URL
+- Startup console logs for frontend dev server showing port, frontend URL, and API base URL
+
+### Technical Details
+- Updated `api/src/server.ts` to display formatted configuration on server startup
+- Added Vite plugin in `frontend/vite.config.ts` to log configuration when dev server starts
+- Startup logs provide clear visibility of configuration values for easy verification and debugging
+
 ## [1.0.2] - 2025-11-15
 
 ### Changed
