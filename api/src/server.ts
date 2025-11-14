@@ -1,7 +1,10 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import * as path from 'path';
+
+// Load .env from root directory
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 import { getDb, closeDb } from './db';
 import partitionRoutes from './routes/partitionRoutes';
 import projectRoutes from './routes/projectRoutes';

@@ -57,6 +57,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - File upload progress indicators during batch uploads
 - Improved error handling and user feedback for uploads
 
+## [1.0.2] - 2025-11-15
+
+### Changed
+- Consolidated environment variables into single root `.env` file
+- Backend server now loads `.env` from project root directory instead of `api/.env`
+- Frontend Vite config now loads `.env` from project root directory instead of `frontend/.env`
+
+### Technical Details
+- Merged `api/.env` and `frontend/.env` into single root `.env` file
+- Updated `api/src/server.ts` to explicitly load `.env` from root directory using `dotenv.config({ path: path.resolve(__dirname, '../../.env') })`
+- Updated `frontend/vite.config.ts` to load environment variables from root directory using `loadEnv(mode, path.resolve(process.cwd(), '..'), '')`
+- Removed separate `.env` files from `api/` and `frontend/` directories
+- All environment variables now centralized in root `.env` file for simplified configuration management
+
 ## [1.0.1] - 2025-01-15
 
 ### Fixed
@@ -229,12 +243,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Configuration
 
 #### Environment Variables
-- **Backend (`api/.env`):**
+- **Root (`.env`):**
   - `PORT` - API server port (default: 3000)
   - `FRONTEND_URL` - Frontend URL for CORS (default: http://localhost:5173)
-
-- **Frontend (`frontend/.env`):**
-  - `VITE_PORT` - Frontend dev server port (default: 5173)
+  - `FRONTEND_PORT` - Frontend dev server port (default: 5173)
   - `VITE_API_BASE_URL` - Backend API base URL (default: http://localhost:3000/api)
 
 ### Project Structure
@@ -250,7 +262,6 @@ portfolio/
 │   │   └── server.ts       # Express server setup
 │   ├── dist/               # Compiled JavaScript
 │   ├── portfolio.db        # SQLite database (auto-generated)
-│   ├── .env                # Environment variables
 │   └── package.json
 ├── frontend/               # Frontend application
 │   ├── src/
@@ -262,8 +273,8 @@ portfolio/
 │   │   └── main.ts         # Entry point
 │   ├── public/
 │   │   └── screenshots/    # Local screenshot storage
-│   ├── .env                # Environment variables
 │   └── package.json
+├── .env                    # Environment variables (consolidated)
 ├── seed.json               # Primary seed data
 ├── seed_p_1.json          # Fallback seed data
 ├── CHANGELOG.md            # This file
