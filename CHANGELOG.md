@@ -64,10 +64,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Backend server now loads `.env` from project root directory instead of `api/.env`
 - Frontend Vite config now loads `.env` from project root directory instead of `frontend/.env`
 
+### Fixed
+- Fixed Vite configuration to properly load environment variables from root directory using `envDir` option
+- Frontend now correctly reads `VITE_API_BASE_URL` from root `.env` file instead of using default port 3000
+
 ### Technical Details
 - Merged `api/.env` and `frontend/.env` into single root `.env` file
 - Updated `api/src/server.ts` to explicitly load `.env` from root directory using `dotenv.config({ path: path.resolve(__dirname, '../../.env') })`
-- Updated `frontend/vite.config.ts` to load environment variables from root directory using `loadEnv(mode, path.resolve(process.cwd(), '..'), '')`
+- Updated `frontend/vite.config.ts` to load environment variables from root directory using `loadEnv(mode, path.resolve(process.cwd(), '..'), '')` and `envDir` option
 - Removed separate `.env` files from `api/` and `frontend/` directories
 - All environment variables now centralized in root `.env` file for simplified configuration management
 

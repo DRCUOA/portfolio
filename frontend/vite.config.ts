@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [vue()],
+    // Tell Vite to look for .env files in the root directory
+    envDir: rootDir,
     server: {
       port: parseInt(env.FRONTEND_PORT || '5173', 10)
     },
