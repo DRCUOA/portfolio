@@ -61,9 +61,23 @@
         <!-- Hero Section -->
         <div class="glass-strong rounded-3xl p-8 md:p-12 mb-8">
           <div class="flex flex-col md:flex-row gap-8 items-start">
-            <!-- App Icon -->
+            <!-- App Icon/Logo -->
             <div class="flex-shrink-0">
-              <div class="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass flex items-center justify-center text-white dark:text-slate-300 text-5xl md:text-6xl font-bold shadow-2xl transition-colors">
+              <div 
+                v-if="project.logoUrl"
+                class="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass overflow-hidden shadow-2xl transition-colors"
+              >
+                <img
+                  :src="getLogoUrl(project.logoUrl)"
+                  :alt="`${project.name} logo`"
+                  class="w-full h-full object-cover"
+                  @error="handleLogoError"
+                />
+              </div>
+              <div 
+                v-else
+                class="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass flex items-center justify-center text-white dark:text-slate-300 text-5xl md:text-6xl font-bold shadow-2xl transition-colors"
+              >
                 {{ project.name.charAt(0) }}
               </div>
             </div>
@@ -222,7 +236,7 @@
         </div>
         
         <!-- Screenshots Section -->
-        <div class="glass-card rounded-3xl p-6 md:p-8 mb-8">
+        <div class="glass-card rounded-3xl p-8 md:p-10 lg:p-12 mb-8">
           <h2 class="text-2xl font-bold text-white dark:text-slate-300 mb-6 transition-colors">Screenshots</h2>
           <div class="relative">
             <div 
@@ -233,9 +247,12 @@
               <div
                 v-for="(screenshot, index) in screenshots"
                 :key="index"
-                class="flex-shrink-0 snap-center"
+                class="flex-shrink-0 snap-center p-4"
               >
-                <div class="glass-strong rounded-2xl overflow-hidden w-64 md:w-80 h-auto shadow-2xl">
+                <div 
+                  class="glass-strong rounded-2xl overflow-hidden w-64 md:w-80 h-auto hover:scale-105 transition-all duration-500 cursor-pointer screenshot-card"
+                  @click="openScreenshotModal(screenshot, index)"
+                >
                   <img
                     :src="screenshot"
                     :alt="`${project.name} screenshot ${index + 1}`"
@@ -355,11 +372,43 @@
                 <p class="text-white/60 dark:text-slate-500 text-lg font-light transition-colors">Project not found.</p>
               </div>
     </div>
+    
+    <!-- Screenshot Modal -->
+    <transition name="modal">
+      <div
+        v-if="isModalOpen && selectedScreenshot"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        @click.self="closeScreenshotModal"
+      >
+        <!-- Greyed background -->
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-500"></div>
+        
+        <!-- Close button -->
+        <button
+          @click="closeScreenshotModal"
+          class="absolute top-4 right-4 z-10 glass-strong rounded-full p-3 hover:scale-110 transition-all duration-300 text-white"
+          aria-label="Close modal"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <!-- Screenshot image -->
+        <div class="relative z-10 max-w-[95vw] max-h-[95vh] flex items-center justify-center">
+          <img
+            :src="selectedScreenshot"
+            :alt="`${project?.name} screenshot ${selectedScreenshotIndex + 1}`"
+            class="max-w-full max-h-[95vh] object-contain rounded-2xl shadow-2xl transition-all duration-500"
+          />
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePortfolioStore, type ProjectDetail } from '../stores/portfolio'
 
@@ -371,6 +420,11 @@ const currentScreenshot = ref(0)
 const iframeError = ref(false)
 const showNsfwWarning = ref(false)
 const nsfwAccepted = ref(false)
+
+// Screenshot modal state
+const selectedScreenshot = ref<string | null>(null)
+const selectedScreenshotIndex = ref(0)
+const isModalOpen = ref(false)
 
 // Helper function to convert screenshot paths to full URLs
 function getScreenshotUrl(path: string): string {
@@ -408,8 +462,12 @@ const screenshots = computed(() => {
     const parsed = JSON.parse(project.value.longDescription || '{}')
     if (parsed.screenshots && Array.isArray(parsed.screenshots)) {
       return parsed.screenshots
-        .filter((url: string) => url && url.trim().length > 0)
-        .map((url: string) => getScreenshotUrl(url))
+        .map((item: string | { url: string; label?: string }) => {
+          // Handle both string and object formats
+          const url = typeof item === 'string' ? item : item.url
+          return url && url.trim().length > 0 ? getScreenshotUrl(url) : null
+        })
+        .filter((url: string | null): url is string => url !== null)
     }
   } catch {
     // Not JSON, continue
@@ -450,6 +508,60 @@ function handleImageError(event: Event) {
   img.style.display = 'none'
 }
 
+function getLogoUrl(path: string): string {
+  // Use the same logic as getScreenshotUrl
+  return getScreenshotUrl(path)
+}
+
+function handleLogoError(event: Event) {
+  const img = event.target as HTMLImageElement
+  // If logo fails to load, hide it and fall back to letter
+  img.style.display = 'none'
+}
+
+function openScreenshotModal(screenshot: string, index: number) {
+  selectedScreenshot.value = screenshot
+  selectedScreenshotIndex.value = index
+  isModalOpen.value = true
+  document.body.style.overflow = 'hidden'
+}
+
+function closeScreenshotModal() {
+  isModalOpen.value = false
+  setTimeout(() => {
+    selectedScreenshot.value = null
+    document.body.style.overflow = ''
+  }, 500) // Wait for transition to complete
+}
+
+function navigateScreenshot(direction: 'prev' | 'next') {
+  if (!screenshots.value.length) return
+  
+  if (direction === 'prev') {
+    selectedScreenshotIndex.value = selectedScreenshotIndex.value > 0 
+      ? selectedScreenshotIndex.value - 1 
+      : screenshots.value.length - 1
+  } else {
+    selectedScreenshotIndex.value = selectedScreenshotIndex.value < screenshots.value.length - 1 
+      ? selectedScreenshotIndex.value + 1 
+      : 0
+  }
+  selectedScreenshot.value = screenshots.value[selectedScreenshotIndex.value]
+}
+
+// Keyboard navigation
+function handleKeydown(event: KeyboardEvent) {
+  if (!isModalOpen.value) return
+  
+  if (event.key === 'Escape') {
+    closeScreenshotModal()
+  } else if (event.key === 'ArrowLeft') {
+    navigateScreenshot('prev')
+  } else if (event.key === 'ArrowRight') {
+    navigateScreenshot('next')
+  }
+}
+
 onMounted(async () => {
   const slug = route.params.slug as string
   project.value = await store.fetchProjectBySlug(slug)
@@ -470,6 +582,14 @@ onMounted(async () => {
       }
     })
   }
+  
+  // Keyboard navigation
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+  document.body.style.overflow = ''
 })
 </script>
 
@@ -489,6 +609,78 @@ onMounted(async () => {
 
 .snap-center {
   scroll-snap-align: center;
+}
+
+/* Modal transitions */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .absolute,
+.modal-leave-active .absolute {
+  transition: opacity 0.5s ease;
+}
+
+.modal-enter-from .absolute,
+.modal-leave-to .absolute {
+  opacity: 0;
+}
+
+.modal-enter-active img,
+.modal-leave-active img {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.modal-enter-from img {
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+.modal-leave-to img {
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+/* Individual screenshot shadows */
+.screenshot-card {
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.3),
+    0 8px 10px -6px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.5s ease;
+  transform-origin: center;
+}
+
+/* Ensure parent container has enough space for scaled screenshots */
+.snap-center {
+  overflow: visible;
+}
+
+.screenshot-card:hover {
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.4),
+    0 15px 20px -10px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.dark .screenshot-card {
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.6),
+    0 8px 10px -6px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.dark .screenshot-card:hover {
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.8),
+    0 15px 20px -10px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 </style>
 

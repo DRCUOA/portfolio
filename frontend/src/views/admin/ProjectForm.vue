@@ -57,6 +57,56 @@
         </div>
 
         <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+            Project Logo
+          </label>
+          
+          <!-- Logo Preview -->
+          <div v-if="logoPreview" class="mb-4">
+            <div class="relative inline-block">
+              <img
+                :src="logoPreview"
+                alt="Logo preview"
+                class="w-32 h-32 md:w-40 md:h-40 rounded-3xl object-cover border-2 border-gray-300 dark:border-slate-600"
+              />
+              <button
+                type="button"
+                @click="removeLogo"
+                class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700 transition-colors"
+                title="Remove logo"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+          
+          <!-- Logo Upload -->
+          <div class="flex items-center gap-4">
+            <input
+              ref="logoInput"
+              type="file"
+              accept="image/*"
+              @change="handleLogoSelect"
+              class="hidden"
+            />
+            <button
+              type="button"
+              @click="logoInput?.click()"
+              :disabled="uploadingLogo"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              {{ uploadingLogo ? 'Uploading...' : (logoPreview ? 'Change Logo' : 'Upload Logo') }}
+            </button>
+            <span v-if="uploadingLogo" class="text-sm text-gray-600 dark:text-slate-400">
+              Uploading...
+            </span>
+          </div>
+          <p class="mt-1 text-sm text-gray-500 dark:text-slate-400">
+            Upload a logo image for this project. Recommended size: 512x512px or larger, square format.
+          </p>
+        </div>
+
+        <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700 mb-2">Tagline</label>
           <input
             v-model="form.tagline"
@@ -124,29 +174,60 @@
 
           <!-- Screenshot Previews -->
           <div v-if="screenshotPreviews.length > 0" class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Uploaded Screenshots
+            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+              Uploaded Screenshots (drag to reorder)
             </label>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div
                 v-for="(screenshot, index) in screenshotPreviews"
-                :key="index"
-                class="relative group"
+                :key="`screenshot-${screenshot.url}-${index}`"
+                :draggable="true"
+                @dragstart="handleDragStart(index, $event)"
+                @dragover.prevent="handleDragOver(index, $event)"
+                @drop="handleDrop(index, $event)"
+                @dragend="handleDragEnd"
+                :class="[
+                  'relative group cursor-move bg-gray-100 dark:bg-slate-700 rounded-md overflow-hidden border-2 transition-all',
+                  draggedIndex === index ? 'opacity-50 border-blue-500' : 'border-gray-300 dark:border-slate-600'
+                ]"
               >
-                <img
-                  :src="getScreenshotUrl(screenshot)"
-                  :alt="`Screenshot ${index + 1}`"
-                  class="w-full h-32 object-cover rounded-md border border-gray-300"
-                  @error="handleImageError"
-                />
-                <button
-                  type="button"
-                  @click="removeScreenshot(index)"
-                  class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  title="Remove screenshot"
-                >
-                  ×
-                </button>
+                <div class="aspect-video w-full" style="min-height: 200px;">
+                  <img
+                    :src="getScreenshotUrl(screenshot.url)"
+                    :alt="screenshot.label || `Screenshot ${index + 1}`"
+                    class="w-full h-full object-cover"
+                    @error="handleImageError"
+                    draggable="false"
+                  />
+                </div>
+                <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  <div class="flex flex-col gap-2 pointer-events-auto">
+                    <button
+                      type="button"
+                      @click.stop.prevent="openLabelModal(index)"
+                      @mousedown.stop
+                      class="bg-blue-600 text-white rounded px-3 py-1.5 text-xs font-medium hover:bg-blue-700 transition-colors whitespace-nowrap"
+                      title="Add/Edit label"
+                    >
+                      {{ screenshot.label ? 'Edit Label' : 'Add Label' }}
+                    </button>
+                    <button
+                      type="button"
+                      @click.stop.prevent="removeScreenshot(index)"
+                      @mousedown.stop
+                      class="bg-red-600 text-white rounded px-3 py-1.5 text-xs font-medium hover:bg-red-700 transition-colors whitespace-nowrap"
+                      title="Remove screenshot"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+                <div v-if="screenshot.label" class="absolute bottom-0 left-0 right-0 bg-black/80 text-white text-xs p-2 truncate">
+                  {{ screenshot.label }}
+                </div>
+                <div class="absolute top-2 left-2 bg-gray-900/90 text-white text-xs font-semibold px-2 py-1 rounded shadow-lg">
+                  {{ index + 1 }}
+                </div>
               </div>
             </div>
           </div>
@@ -342,6 +423,52 @@
         </div>
       </form>
     </div>
+    
+    <!-- Label Modal -->
+    <transition name="modal-fade">
+      <div
+        v-if="labelModalOpen"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+        @click.self="closeLabelModal"
+        @keyup.escape="closeLabelModal"
+      >
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full p-6 transform transition-all">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
+            {{ labelModalIndex >= 0 && labelModalIndex < screenshotPreviews.length && screenshotPreviews[labelModalIndex]?.label ? 'Edit Label' : 'Add Label' }}
+          </h3>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+              Label (optional)
+            </label>
+            <input
+              ref="labelInput"
+              v-model="labelModalValue"
+              type="text"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+              placeholder="Enter a descriptive label for this screenshot"
+              @keyup.enter="saveLabel"
+              @keyup.escape="closeLabelModal"
+            />
+          </div>
+          <div class="flex gap-3 justify-end">
+            <button
+              type="button"
+              @click="closeLabelModal"
+              class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-200 rounded hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              @click="saveLabel"
+              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -368,6 +495,7 @@ const form = ref<CreateProjectInput>({
   primaryRepoUrl: '',
   liveUrl: '',
   githubRepoFullName: '',
+  logoUrl: '',
   inPortfolio: true,
   nsfw: false,
 })
@@ -379,7 +507,19 @@ const error = ref<string | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const uploading = ref(false)
 const uploadProgress = ref('')
-const screenshotPreviews = ref<string[]>([])
+const screenshotPreviews = ref<Array<{ url: string; label: string }>>([])
+
+// Logo upload state
+const logoInput = ref<HTMLInputElement | null>(null)
+const uploadingLogo = ref(false)
+const logoPreview = ref<string | null>(null)
+
+// Label modal state
+const labelModalOpen = ref(false)
+const labelModalIndex = ref(-1)
+const labelModalValue = ref('')
+const draggedIndex = ref<number | null>(null)
+const labelInput = ref<HTMLInputElement | null>(null)
 
 const availablePartitions = ref<Array<{ id: string; name: string; description: string; sortOrder: number }>>([])
 const selectedPartitions = ref<string[]>([])
@@ -420,7 +560,7 @@ onMounted(async () => {
       
       if (project) {
         // Try to extract screenshots from longDescription if it's JSON
-        let screenshots: string[] = []
+        let screenshots: Array<string | { url: string; label?: string }> = []
         let description = project.longDescription || ''
         
         try {
@@ -433,8 +573,21 @@ onMounted(async () => {
           // Not JSON, use as-is
         }
         
-        screenshotsInput.value = screenshots.join('\n')
-        screenshotPreviews.value = screenshots
+        // Convert screenshots to array of objects with url and label
+        screenshotPreviews.value = screenshots.map((screenshot: string | { url: string; label?: string }) => {
+          if (typeof screenshot === 'string') {
+            return { url: screenshot, label: '' }
+          }
+          return { url: screenshot.url, label: screenshot.label || '' }
+        })
+        
+        screenshotsInput.value = screenshotPreviews.value.map(s => s.url).join('\n')
+        
+        // Load logo if available
+        if (project.logoUrl) {
+          logoPreview.value = getScreenshotUrl(project.logoUrl)
+          form.value.logoUrl = project.logoUrl
+        }
         
         form.value = {
           id: project.id,
@@ -447,6 +600,7 @@ onMounted(async () => {
           primaryRepoUrl: project.primaryRepoUrl,
           liveUrl: project.liveUrl,
           githubRepoFullName: project.githubRepoFullName,
+          logoUrl: project.logoUrl || '',
           inPortfolio: project.inPortfolio,
           nsfw: project.nsfw || false,
         }
@@ -481,10 +635,15 @@ watch(screenshotsInput, (newValue) => {
     .filter(url => url.length > 0)
   
   // Only update previews if they're different (to avoid loops)
-  const currentPreviews = screenshotPreviews.value.join('\n')
-  const newPreviews = screenshots.join('\n')
-  if (currentPreviews !== newPreviews) {
-    screenshotPreviews.value = screenshots
+  const currentUrls = screenshotPreviews.value.map(s => s.url).join('\n')
+  const newUrls = screenshots.join('\n')
+  if (currentUrls !== newUrls) {
+    // Preserve labels when updating from input
+    const urlToLabel = new Map(screenshotPreviews.value.map(s => [s.url, s.label]))
+    screenshotPreviews.value = screenshots.map(url => ({
+      url,
+      label: urlToLabel.get(url) || ''
+    }))
   }
 })
 
@@ -500,6 +659,54 @@ watch(selectedPartitions, (newSelection) => {
     }
   })
 }, { deep: true })
+
+// Handle logo upload
+async function handleLogoSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  
+  if (!file) return
+  
+  uploadingLogo.value = true
+  
+  try {
+    const projectSlug = form.value.slug || 'uploads'
+    const path = await store.uploadScreenshot(file, projectSlug)
+    
+    // Update form and preview
+    form.value.logoUrl = path
+    logoPreview.value = getScreenshotUrl(path)
+    
+    // Reset file input
+    if (logoInput.value) {
+      logoInput.value.value = ''
+    }
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to upload logo'
+  } finally {
+    uploadingLogo.value = false
+  }
+}
+
+function removeLogo() {
+  const logoUrl = form.value.logoUrl
+  
+  // If it's an uploaded file (starts with /screenshots/), try to delete it
+  if (logoUrl && logoUrl.startsWith('/screenshots/')) {
+    store.deleteScreenshot(logoUrl).catch(err => {
+      console.error('Failed to delete logo file:', err)
+      // Continue with removal from UI even if server deletion fails
+    })
+  }
+  
+  form.value.logoUrl = ''
+  logoPreview.value = null
+  
+  // Reset file input
+  if (logoInput.value) {
+    logoInput.value.value = ''
+  }
+}
 
 // Handle file selection and upload
 async function handleFileSelect(event: Event) {
@@ -530,9 +737,10 @@ async function handleFileSelect(event: Event) {
     
     // Add uploaded paths to screenshots
     const currentScreenshots = screenshotPreviews.value
-    const allScreenshots = [...currentScreenshots, ...uploadedPaths]
+    const newScreenshots = uploadedPaths.map(url => ({ url, label: '' }))
+    const allScreenshots = [...currentScreenshots, ...newScreenshots]
     screenshotPreviews.value = allScreenshots
-    screenshotsInput.value = allScreenshots.join('\n')
+    screenshotsInput.value = allScreenshots.map(s => s.url).join('\n')
     
     // Reset file input
     if (fileInput.value) {
@@ -547,46 +755,159 @@ async function handleFileSelect(event: Event) {
 }
 
 // Get full URL for screenshot display
-function getScreenshotUrl(path: string): string {
+function getScreenshotUrl(path: string | { url: string; label?: string }): string {
+  const url = typeof path === 'string' ? path : path.url
   // If it's already a full URL, return as-is
-  if (path.startsWith('http://') || path.startsWith('https://')) {
-    return path
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
   }
   
   // If it starts with /, it's a local path
   // In development, Vite serves files from public folder, so relative paths work
   // In production, we may need to construct full URLs
-  if (path.startsWith('/')) {
+  if (url.startsWith('/')) {
     // Check if we're in development (Vite serves public folder)
     if (import.meta.env.DEV) {
       // In development, Vite serves /screenshots/ directly from public folder
-      return path
+      return url
     } else {
       // In production, construct URL using API base (backend serves static files)
       const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
       const baseUrl = apiBase.replace('/api', '')
-      return `${baseUrl}${path}`
+      return `${baseUrl}${url}`
     }
   }
   
   // Otherwise, prepend / and use relative path
-  return `/${path}`
+  return `/${url}`
 }
 
 // Remove screenshot from list
 function removeScreenshot(index: number) {
+  if (index < 0 || index >= screenshotPreviews.value.length) return
+  
   const screenshot = screenshotPreviews.value[index]
   
+  // Confirm deletion
+  if (!confirm(`Are you sure you want to remove this screenshot?`)) {
+    return
+  }
+  
   // If it's an uploaded file (starts with /screenshots/), try to delete it
-  if (screenshot.startsWith('/screenshots/')) {
-    store.deleteScreenshot(screenshot).catch(err => {
+  if (screenshot.url.startsWith('/screenshots/')) {
+    store.deleteScreenshot(screenshot.url).catch(err => {
       console.error('Failed to delete file:', err)
       // Continue with removal from UI even if server deletion fails
     })
   }
   
-  screenshotPreviews.value.splice(index, 1)
-  screenshotsInput.value = screenshotPreviews.value.join('\n')
+  // Create a new array to ensure reactivity
+  const newScreenshots = [...screenshotPreviews.value]
+  newScreenshots.splice(index, 1)
+  screenshotPreviews.value = newScreenshots
+  screenshotsInput.value = screenshotPreviews.value.map(s => s.url).join('\n')
+  
+  // Close label modal if it was open for this screenshot
+  if (labelModalIndex.value === index) {
+    closeLabelModal()
+  } else if (labelModalIndex.value > index) {
+    // Adjust modal index if a screenshot before it was removed
+    labelModalIndex.value--
+  }
+}
+
+// Drag and drop handlers
+function handleDragStart(index: number, event: DragEvent) {
+  // Don't start drag if clicking on buttons
+  const target = event.target as HTMLElement
+  if (target.closest('button')) {
+    event.preventDefault()
+    return
+  }
+  
+  draggedIndex.value = index
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', index.toString())
+    // Create a drag image
+    const dragElement = event.currentTarget as HTMLElement
+    if (dragElement) {
+      const rect = dragElement.getBoundingClientRect()
+      event.dataTransfer.setDragImage(dragElement, rect.width / 2, rect.height / 2)
+    }
+  }
+}
+
+function handleDragOver(index: number, event: DragEvent) {
+  event.preventDefault()
+  event.stopPropagation()
+  if (event.dataTransfer && draggedIndex.value !== null && draggedIndex.value !== index) {
+    event.dataTransfer.dropEffect = 'move'
+  }
+}
+
+function handleDrop(index: number, event: DragEvent) {
+  event.preventDefault()
+  event.stopPropagation()
+  
+  if (draggedIndex.value === null || draggedIndex.value === index) {
+    draggedIndex.value = null
+    return
+  }
+  
+  // Create a copy of the array to avoid reactivity issues
+  const newScreenshots = [...screenshotPreviews.value]
+  const draggedItem = newScreenshots[draggedIndex.value]
+  
+  // Remove from old position
+  newScreenshots.splice(draggedIndex.value, 1)
+  
+  // Insert at new position
+  const insertIndex = draggedIndex.value < index ? index - 1 : index
+  newScreenshots.splice(insertIndex, 0, draggedItem)
+  
+  screenshotPreviews.value = newScreenshots
+  screenshotsInput.value = screenshotPreviews.value.map(s => s.url).join('\n')
+  draggedIndex.value = null
+}
+
+function handleDragEnd() {
+  draggedIndex.value = null
+}
+
+// Label modal handlers
+function openLabelModal(index: number) {
+  if (index < 0 || index >= screenshotPreviews.value.length) return
+  
+  labelModalIndex.value = index
+  labelModalValue.value = screenshotPreviews.value[index]?.label || ''
+  labelModalOpen.value = true
+  
+  // Focus input after modal opens
+  setTimeout(() => {
+    labelInput.value?.focus()
+  }, 100)
+}
+
+function closeLabelModal() {
+  labelModalOpen.value = false
+  setTimeout(() => {
+    labelModalIndex.value = -1
+    labelModalValue.value = ''
+  }, 200) // Small delay to allow modal close animation
+}
+
+function saveLabel() {
+  if (labelModalIndex.value >= 0 && labelModalIndex.value < screenshotPreviews.value.length) {
+    // Create a new array to ensure reactivity
+    const newScreenshots = [...screenshotPreviews.value]
+    newScreenshots[labelModalIndex.value] = {
+      ...newScreenshots[labelModalIndex.value],
+      label: labelModalValue.value.trim()
+    }
+    screenshotPreviews.value = newScreenshots
+  }
+  closeLabelModal()
 }
 
 // Handle image load errors
@@ -621,9 +942,17 @@ async function handleSubmit() {
           .split('\n')
           .map(url => url.trim())
           .filter(url => url.length > 0)
+          .map(url => ({ url, label: '' }))
     
     // Normalize all screenshot paths to ensure we store relative paths, not full URLs
-    const normalizedScreenshots = screenshots.map(normalizeScreenshotPath)
+    const normalizedScreenshots = screenshots.map(screenshot => {
+      const normalizedUrl = normalizeScreenshotPath(screenshot.url)
+      // Only include label if it's not empty
+      if (screenshot.label && screenshot.label.trim()) {
+        return { url: normalizedUrl, label: screenshot.label.trim() }
+      }
+      return normalizedUrl // Backward compatibility: store as string if no label
+    })
     
     // Combine description and screenshots into JSON if screenshots exist
     let longDescription = form.value.longDescription
@@ -646,6 +975,7 @@ async function handleSubmit() {
         primaryRepoUrl: form.value.primaryRepoUrl,
         liveUrl: form.value.liveUrl,
         githubRepoFullName: form.value.githubRepoFullName,
+        logoUrl: form.value.logoUrl || undefined,
         inPortfolio: form.value.inPortfolio,
         nsfw: form.value.nsfw,
       }
@@ -713,4 +1043,28 @@ async function handleSubmit() {
   }
 }
 </script>
+
+<style scoped>
+/* Modal transition */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.modal-fade-enter-active .bg-white,
+.modal-fade-leave-active .bg-white {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-fade-enter-from .bg-white,
+.modal-fade-leave-to .bg-white {
+  transform: scale(0.95);
+  opacity: 0;
+}
+</style>
 

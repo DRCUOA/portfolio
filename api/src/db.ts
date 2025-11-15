@@ -68,6 +68,16 @@ function initializeDb(): void {
     }
   }
 
+  // Migration: Add logoUrl column if it doesn't exist
+  try {
+    db!.exec('ALTER TABLE projects ADD COLUMN logoUrl TEXT');
+  } catch (error: any) {
+    // Column already exists, ignore error
+    if (!error.message.includes('duplicate column name')) {
+      console.warn('Migration warning:', error.message);
+    }
+  }
+
   // Check if database is empty
   const partitionCount = db!.prepare('SELECT COUNT(*) as count FROM partitions').get() as { count: number };
   
@@ -98,9 +108,9 @@ function loadSeedData(): void {
   const insertProject = db!.prepare(`
     INSERT INTO projects (
       id, slug, name, tagline, shortDescription, longDescription,
-      status, primaryRepoUrl, liveUrl, githubRepoFullName,
+      status, primaryRepoUrl, liveUrl, githubRepoFullName, logoUrl,
       createdAt, updatedAt, inPortfolio, nsfw
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const insertProjectPartition = db!.prepare(`
@@ -133,6 +143,7 @@ function loadSeedData(): void {
         project.primaryRepoUrl || null,
         project.liveUrl || null,
         project.githubRepoFullName || null,
+        project.logoUrl || null,
         project.createdAt,
         project.updatedAt,
         project.inPortfolio === true ? 1 : 0,

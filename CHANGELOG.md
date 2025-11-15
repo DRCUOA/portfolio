@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Backend CORS configuration via environment variables (supports multiple origins)
 - Local screenshot support with `/screenshots/` directory in public folder
 - Screenshot usage documentation and examples
+- **Screenshot hover effects with smooth transitions** - Screenshots now scale up on hover with 500ms transitions matching other UI animations
+- **Fullscreen screenshot modal** - Click screenshots to view in almost fullscreen modal with greyed background, smooth transitions, and keyboard navigation (Escape to close, Arrow keys to navigate)
+- **Screenshot drag-and-drop reordering** - Admin panel now supports drag-and-drop to reorder screenshots in ProjectForm
+- **Screenshot labels** - Add descriptive labels to screenshots in admin panel with modal editor
+- **Project logo upload** - Upload custom logos for projects displayed in header instead of letter symbol
+- **Individual screenshot shadows** - Each screenshot now has its own distinct shadow for better visual separation
 
 ### Changed
 - Database schema: Added `nsfw INTEGER DEFAULT 0` column to projects table
@@ -34,6 +40,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Screenshot URL handling: Fixed display issues in AppStoreView and ProjectDetail
 - Description sections now properly extract text from JSON, avoiding raw JSON display
 - Screenshot paths normalized to ensure relative paths are stored (not full URLs)
+- **Screenshot data structure** - Screenshots now support both string URLs and object format with labels `{url: string, label?: string}` for backward compatibility
+- **Screenshot container padding** - Increased padding around screenshots to prevent overflow during hover zoom effects
+- **Screenshot preview sizing** - Admin panel screenshot previews are now 30% larger with improved grid layout
+- **Project header** - Now displays uploaded logo image instead of letter symbol when logo is available
 
 ### Technical Details
 - Added `nsfw INTEGER DEFAULT 0` column to projects table with automatic migration
@@ -46,6 +56,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created `/frontend/.env` with `VITE_PORT` and `VITE_API_BASE_URL` configuration
 - Updated `.gitignore` files to exclude `.env` files from version control
 - Created `/frontend/public/screenshots/` directory structure for local images
+- **Database schema**: Added `logoUrl TEXT` column to projects table with automatic migration
+- **Screenshot storage**: Enhanced to support labeled screenshots with backward compatibility for string-only format
+- **Modal system**: Implemented Vue transition-based modal for screenshot fullscreen view and label editing
+- **Drag-and-drop**: HTML5 drag-and-drop API implementation for screenshot reordering in admin panel
 
 ### UI/UX Improvements
 - NSFW warning modal with "Go Back" and "Continue" options
@@ -56,6 +70,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Screenshot preview grid with thumbnail images and remove buttons
 - File upload progress indicators during batch uploads
 - Improved error handling and user feedback for uploads
+- **Enhanced screenshot display** - Individual shadows, improved spacing, and hover effects for better visual hierarchy
+- **Screenshot modal UX** - Smooth fade and scale transitions, click-outside-to-close, keyboard navigation support
+- **Admin panel improvements** - Drag-and-drop visual feedback, label display on thumbnails, improved button layout
+- **Logo display** - Custom project logos with fallback to letter symbol, maintains 3D effects and styling
 
 ## [1.0.3] - 2025-11-15
 

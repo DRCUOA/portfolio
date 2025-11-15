@@ -11,6 +11,7 @@ export interface Project {
   primaryRepoUrl: string | null;
   liveUrl: string | null;
   githubRepoFullName: string | null;
+  logoUrl: string | null;
   createdAt: string;
   updatedAt: string;
   inPortfolio: number;
@@ -28,6 +29,7 @@ export interface CreateProjectInput {
   primaryRepoUrl?: string;
   liveUrl?: string;
   githubRepoFullName?: string;
+  logoUrl?: string;
   inPortfolio?: boolean;
   nsfw?: boolean;
 }
@@ -35,6 +37,7 @@ export interface CreateProjectInput {
 export interface UpdateProjectInput {
   name?: string;
   tagline?: string;
+  logoUrl?: string;
   shortDescription?: string;
   longDescription?: string;
   status?: string;
@@ -67,9 +70,9 @@ export class ProjectModel {
     const stmt = db.prepare(`
       INSERT INTO projects (
         id, slug, name, tagline, shortDescription, longDescription,
-        status, primaryRepoUrl, liveUrl, githubRepoFullName,
+        status, primaryRepoUrl, liveUrl, githubRepoFullName, logoUrl,
         createdAt, updatedAt, inPortfolio, nsfw
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     stmt.run(
       data.id,
@@ -82,6 +85,7 @@ export class ProjectModel {
       data.primaryRepoUrl || null,
       data.liveUrl || null,
       data.githubRepoFullName || null,
+      data.logoUrl || null,
       now,
       now,
       data.inPortfolio === false ? 0 : 1,
@@ -126,6 +130,10 @@ export class ProjectModel {
     if (data.githubRepoFullName !== undefined) {
       updates.push('githubRepoFullName = ?');
       values.push(data.githubRepoFullName || null);
+    }
+    if (data.logoUrl !== undefined) {
+      updates.push('logoUrl = ?');
+      values.push(data.logoUrl || null);
     }
     if (data.inPortfolio !== undefined) {
       updates.push('inPortfolio = ?');

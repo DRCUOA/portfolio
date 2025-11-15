@@ -421,6 +421,7 @@ export interface CreateProjectInput {
   primaryRepoUrl?: string
   liveUrl?: string
   githubRepoFullName?: string
+  logoUrl?: string
   inPortfolio?: boolean
   nsfw?: boolean
 }
@@ -434,6 +435,7 @@ export interface UpdateProjectInput {
   primaryRepoUrl?: string
   liveUrl?: string
   githubRepoFullName?: string
+  logoUrl?: string
   inPortfolio?: boolean
   nsfw?: boolean
 }

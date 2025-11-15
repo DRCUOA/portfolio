@@ -16,6 +16,7 @@ export class ProjectController {
         primaryRepoUrl: p.primaryRepoUrl || '',
         liveUrl: p.liveUrl || '',
         githubRepoFullName: p.githubRepoFullName || '',
+        logoUrl: p.logoUrl || '',
         inPortfolio: p.inPortfolio === 1,
         nsfw: p.nsfw === 1,
       })));
@@ -53,6 +54,7 @@ export class ProjectController {
         primaryRepoUrl: project.primaryRepoUrl || '',
         liveUrl: project.liveUrl || '',
         githubRepoFullName: project.githubRepoFullName || '',
+        logoUrl: project.logoUrl || '',
         inPortfolio: project.inPortfolio === 1,
         nsfw: project.nsfw === 1,
         partitions,
@@ -100,6 +102,7 @@ export class ProjectController {
         primaryRepoUrl: project.primaryRepoUrl || '',
         liveUrl: project.liveUrl || '',
         githubRepoFullName: project.githubRepoFullName || '',
+        logoUrl: project.logoUrl || '',
         inPortfolio: project.inPortfolio === 1,
         nsfw: project.nsfw === 1,
       });
@@ -135,6 +138,7 @@ export class ProjectController {
         primaryRepoUrl: updated.primaryRepoUrl || '',
         liveUrl: updated.liveUrl || '',
         githubRepoFullName: updated.githubRepoFullName || '',
+        logoUrl: updated.logoUrl || '',
         inPortfolio: updated.inPortfolio === 1,
         nsfw: updated.nsfw === 1,
       });

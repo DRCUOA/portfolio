@@ -96,9 +96,22 @@
             <div class="absolute inset-0 opacity-30 animate-gradient-shift"></div>
             
             <div class="relative z-10 flex flex-col md:flex-row gap-8 items-start">
-              <!-- App Icon with 3D effect -->
+              <!-- App Icon/Logo with 3D effect -->
               <div class="flex-shrink-0">
                 <div 
+                  v-if="project.logoUrl"
+                  class="app-icon-3d w-32 h-32 md:w-40 md:h-40 rounded-3xl glass overflow-hidden shadow-2xl transition-all duration-500 hover:scale-110 hover:rotate-6"
+                  :style="{ transform: `rotateY(${iconRotation}deg) rotateX(${iconTilt}deg)` }"
+                >
+                  <img
+                    :src="getLogoUrl(project.logoUrl)"
+                    :alt="`${project.name} logo`"
+                    class="w-full h-full object-cover"
+                    @error="handleLogoError"
+                  />
+                </div>
+                <div 
+                  v-else
                   class="app-icon-3d w-32 h-32 md:w-40 md:h-40 rounded-3xl glass flex items-center justify-center text-white dark:text-slate-300 text-5xl md:text-6xl font-bold shadow-2xl transition-all duration-500 hover:scale-110 hover:rotate-6"
                   :style="{ transform: `rotateY(${iconRotation}deg) rotateX(${iconTilt}deg)` }"
                 >
@@ -292,7 +305,7 @@
         :class="{ 'animate-fade-in-up': screenshotsVisible }"
       >
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div class="glass-card rounded-3xl p-6 md:p-8">
+          <div class="glass-card rounded-3xl p-8 md:p-10 lg:p-12">
             <h2 class="text-2xl font-bold text-white dark:text-slate-300 mb-6">Screenshots</h2>
             <div class="relative">
               <div 
@@ -303,11 +316,14 @@
                 <div
                   v-for="(screenshot, index) in screenshots"
                   :key="index"
-                  class="flex-shrink-0 snap-center"
+                  class="flex-shrink-0 snap-center p-4"
                   :class="{ 'animate-scale-in': screenshotsVisible }"
                   :style="{ animationDelay: `${index * 0.1}s` }"
                 >
-                  <div class="glass-strong rounded-2xl overflow-hidden w-64 md:w-80 h-auto shadow-2xl hover:scale-105 transition-transform duration-500">
+                  <div 
+                    class="glass-strong rounded-2xl overflow-hidden w-64 md:w-80 h-auto hover:scale-105 transition-all duration-500 cursor-pointer screenshot-card"
+                    @click="openScreenshotModal(screenshot, index)"
+                  >
                     <img
                       :src="screenshot"
                       :alt="`${project.name} screenshot ${index + 1}`"
@@ -436,6 +452,38 @@
         <p class="text-white/90 dark:text-slate-300 text-lg font-light">Project not found.</p>
       </div>
     </div>
+    
+    <!-- Screenshot Modal -->
+    <transition name="modal">
+      <div
+        v-if="isModalOpen && selectedScreenshot"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        @click.self="closeScreenshotModal"
+      >
+        <!-- Greyed background -->
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-500"></div>
+        
+        <!-- Close button -->
+        <button
+          @click="closeScreenshotModal"
+          class="absolute top-4 right-4 z-10 glass-strong rounded-full p-3 hover:scale-110 transition-all duration-300 text-white"
+          aria-label="Close modal"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <!-- Screenshot image -->
+        <div class="relative z-10 max-w-[95vw] max-h-[95vh] flex items-center justify-center">
+          <img
+            :src="selectedScreenshot"
+            :alt="`${project?.name} screenshot ${selectedScreenshotIndex + 1}`"
+            class="max-w-full max-h-[95vh] object-contain rounded-2xl shadow-2xl transition-all duration-500"
+          />
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -487,6 +535,11 @@ const partitionsRef = ref<HTMLElement | null>(null)
 const screenshotContainer = ref<HTMLElement | null>(null)
 const currentScreenshot = ref(0)
 
+// Screenshot modal state
+const selectedScreenshot = ref<string | null>(null)
+const selectedScreenshotIndex = ref(0)
+const isModalOpen = ref(false)
+
 // Extract screenshots and description
 function getScreenshotUrl(path: string): string {
   if (path.startsWith('http://') || path.startsWith('https://')) {
@@ -510,8 +563,12 @@ const screenshots = computed(() => {
     const parsed = JSON.parse(project.value.longDescription || '{}')
     if (parsed.screenshots && Array.isArray(parsed.screenshots)) {
       return parsed.screenshots
-        .filter((url: string) => url && url.trim().length > 0)
-        .map((url: string) => getScreenshotUrl(url))
+        .map((item: string | { url: string; label?: string }) => {
+          // Handle both string and object formats
+          const url = typeof item === 'string' ? item : item.url
+          return url && url.trim().length > 0 ? getScreenshotUrl(url) : null
+        })
+        .filter((url: string | null): url is string => url !== null)
     }
   } catch {
     // Not JSON, continue
@@ -579,6 +636,60 @@ function formatDate(dateString: string): string {
 function handleImageError(event: Event) {
   const img = event.target as HTMLImageElement
   img.style.display = 'none'
+}
+
+function getLogoUrl(path: string): string {
+  // Use the same logic as getScreenshotUrl
+  return getScreenshotUrl(path)
+}
+
+function handleLogoError(event: Event) {
+  const img = event.target as HTMLImageElement
+  // If logo fails to load, hide it and fall back to letter
+  img.style.display = 'none'
+}
+
+function openScreenshotModal(screenshot: string, index: number) {
+  selectedScreenshot.value = screenshot
+  selectedScreenshotIndex.value = index
+  isModalOpen.value = true
+  document.body.style.overflow = 'hidden'
+}
+
+function closeScreenshotModal() {
+  isModalOpen.value = false
+  setTimeout(() => {
+    selectedScreenshot.value = null
+    document.body.style.overflow = ''
+  }, 500) // Wait for transition to complete
+}
+
+function navigateScreenshot(direction: 'prev' | 'next') {
+  if (!screenshots.value.length) return
+  
+  if (direction === 'prev') {
+    selectedScreenshotIndex.value = selectedScreenshotIndex.value > 0 
+      ? selectedScreenshotIndex.value - 1 
+      : screenshots.value.length - 1
+  } else {
+    selectedScreenshotIndex.value = selectedScreenshotIndex.value < screenshots.value.length - 1 
+      ? selectedScreenshotIndex.value + 1 
+      : 0
+  }
+  selectedScreenshot.value = screenshots.value[selectedScreenshotIndex.value]
+}
+
+// Keyboard navigation
+function handleKeydown(event: KeyboardEvent) {
+  if (!isModalOpen.value) return
+  
+  if (event.key === 'Escape') {
+    closeScreenshotModal()
+  } else if (event.key === 'ArrowLeft') {
+    navigateScreenshot('prev')
+  } else if (event.key === 'ArrowRight') {
+    navigateScreenshot('next')
+  }
 }
 
 // Scroll handlers
@@ -747,6 +858,9 @@ onMounted(async () => {
   window.addEventListener('scroll', handleScroll, { passive: true })
   window.addEventListener('mousemove', handleMouseMove, { passive: true })
   
+  // Keyboard navigation
+  window.addEventListener('keydown', handleKeydown)
+  
   // Set up screenshot scrolling
   if (screenshotContainer.value && screenshots.value.length > 0) {
     screenshotContainer.value.addEventListener('scroll', () => {
@@ -770,9 +884,11 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('mousemove', handleMouseMove)
+  window.removeEventListener('keydown', handleKeydown)
   if (scrollTimeout) {
     clearTimeout(scrollTimeout)
   }
+  document.body.style.overflow = ''
 })
 </script>
 
@@ -953,6 +1069,78 @@ onUnmounted(() => {
   background: rgba(35, 35, 40, 1) !important;
   border-color: rgba(170, 170, 180, 0.2);
   box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* Modal transitions */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .absolute,
+.modal-leave-active .absolute {
+  transition: opacity 0.5s ease;
+}
+
+.modal-enter-from .absolute,
+.modal-leave-to .absolute {
+  opacity: 0;
+}
+
+.modal-enter-active img,
+.modal-leave-active img {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.modal-enter-from img {
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+.modal-leave-to img {
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+/* Individual screenshot shadows */
+.screenshot-card {
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.3),
+    0 8px 10px -6px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.5s ease;
+  transform-origin: center;
+}
+
+/* Ensure parent container has enough space for scaled screenshots */
+.snap-center {
+  overflow: visible;
+}
+
+.screenshot-card:hover {
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.4),
+    0 15px 20px -10px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.dark .screenshot-card {
+  box-shadow: 
+    0 10px 25px -5px rgba(0, 0, 0, 0.6),
+    0 8px 10px -6px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.dark .screenshot-card:hover {
+  box-shadow: 
+    0 20px 40px -10px rgba(0, 0, 0, 0.8),
+    0 15px 20px -10px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 </style>
 
