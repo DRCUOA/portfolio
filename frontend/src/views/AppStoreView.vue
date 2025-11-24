@@ -64,7 +64,27 @@
             <!-- App Icon/Logo -->
             <div class="flex-shrink-0">
               <div 
-                v-if="project.logoUrl"
+                v-if="project.name.toLowerCase() === 'e-artem'"
+                class="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass overflow-hidden shadow-2xl transition-colors"
+              >
+                <img
+                  src="/e-artem-icon.png"
+                  :alt="`${project.name} logo`"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div 
+                v-else-if="project.name.toLowerCase() === 'simples'"
+                class="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass overflow-hidden shadow-2xl transition-colors"
+              >
+                <img
+                  src="/simples-icon.png"
+                  :alt="`${project.name} logo`"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div 
+                v-else-if="project.logoUrl"
                 class="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass overflow-hidden shadow-2xl transition-colors"
               >
                 <img

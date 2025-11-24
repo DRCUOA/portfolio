@@ -50,7 +50,30 @@
                 class="block"
               >
                 <div class="flex items-start justify-between mb-4">
-                  <div class="w-12 h-12 rounded-2xl glass-strong flex items-center justify-center text-white dark:text-slate-300 text-lg font-bold transition-colors">
+                  <div 
+                    v-if="project.name.toLowerCase() === 'e-artem'"
+                    class="w-12 h-12 rounded-2xl glass-strong flex items-center justify-center overflow-hidden transition-colors"
+                  >
+                    <img
+                      src="/e-artem-icon.png"
+                      :alt="`${project.name} logo`"
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div 
+                    v-else-if="project.name.toLowerCase() === 'simples'"
+                    class="w-12 h-12 rounded-2xl glass-strong flex items-center justify-center overflow-hidden transition-colors"
+                  >
+                    <img
+                      src="/simples-icon.png"
+                      :alt="`${project.name} logo`"
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div 
+                    v-else
+                    class="w-12 h-12 rounded-2xl glass-strong flex items-center justify-center text-white dark:text-slate-300 text-lg font-bold transition-colors"
+                  >
                     {{ project.name.charAt(0) }}
                   </div>
                   <div class="flex flex-col items-end gap-2">

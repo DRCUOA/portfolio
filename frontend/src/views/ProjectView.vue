@@ -99,7 +99,29 @@
               <!-- App Icon/Logo with 3D effect -->
               <div class="flex-shrink-0">
                 <div 
-                  v-if="project.logoUrl"
+                  v-if="project.name.toLowerCase() === 'e-artem'"
+                  class="app-icon-3d w-32 h-32 md:w-40 md:h-40 rounded-3xl glass overflow-hidden shadow-2xl transition-all duration-500 hover:scale-110 hover:rotate-6"
+                  :style="{ transform: `rotateY(${iconRotation}deg) rotateX(${iconTilt}deg)` }"
+                >
+                  <img
+                    src="/e-artem-icon.png"
+                    :alt="`${project.name} logo`"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div 
+                  v-else-if="project.name.toLowerCase() === 'simples'"
+                  class="app-icon-3d w-32 h-32 md:w-40 md:h-40 rounded-3xl glass overflow-hidden shadow-2xl transition-all duration-500 hover:scale-110 hover:rotate-6"
+                  :style="{ transform: `rotateY(${iconRotation}deg) rotateX(${iconTilt}deg)` }"
+                >
+                  <img
+                    src="/simples-icon.png"
+                    :alt="`${project.name} logo`"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <div 
+                  v-else-if="project.logoUrl"
                   class="app-icon-3d w-32 h-32 md:w-40 md:h-40 rounded-3xl glass overflow-hidden shadow-2xl transition-all duration-500 hover:scale-110 hover:rotate-6"
                   :style="{ transform: `rotateY(${iconRotation}deg) rotateX(${iconTilt}deg)` }"
                 >

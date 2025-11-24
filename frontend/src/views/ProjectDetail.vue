@@ -61,7 +61,30 @@
         <!-- Hero Card -->
         <div class="glass-strong rounded-3xl p-10 md:p-12 mb-8">
           <div class="flex items-start justify-between mb-6">
-            <div class="w-24 h-24 rounded-3xl glass flex items-center justify-center text-white dark:text-slate-300 text-4xl font-bold transition-colors">
+            <div 
+              v-if="project.name.toLowerCase() === 'e-artem'"
+              class="w-24 h-24 rounded-3xl glass flex items-center justify-center overflow-hidden transition-colors"
+            >
+              <img
+                src="/e-artem-icon.png"
+                :alt="`${project.name} logo`"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div 
+              v-else-if="project.name.toLowerCase() === 'simples'"
+              class="w-24 h-24 rounded-3xl glass flex items-center justify-center overflow-hidden transition-colors"
+            >
+              <img
+                src="/simples-icon.png"
+                :alt="`${project.name} logo`"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div 
+              v-else
+              class="w-24 h-24 rounded-3xl glass flex items-center justify-center text-white dark:text-slate-300 text-4xl font-bold transition-colors"
+            >
               {{ project.name.charAt(0) }}
             </div>
             <div class="flex flex-col items-end gap-2">
