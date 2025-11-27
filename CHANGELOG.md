@@ -1,3 +1,30 @@
+## [1.1.3] - 2025-01-XX
+
+### Changed
+- Port ID field removed from create/edit forms, now auto-generated from project ID and server type
+- Port form layout improved: port number input and selector dropdown displayed on same line
+- Port number input width reduced to 40% on large screens for better visual balance
+- Port list now displays project status badges instead of server type badges
+- Port list project name resolution improved to handle legacy server slug format
+- Port checker PID detection now filters for LISTEN state only, excluding client connections
+- Port form made fully responsive with mobile-first breakpoints
+
+### Added
+- Project ID validation in port create/update endpoints
+- Project status filter in port list view (Live, Prototype, Archived)
+- Automatic port ID generation: `{projectId}-{serverType}` format
+- Project status badges in port list grouped view headers
+
+### Technical Details
+- Port ID auto-generated on form submission from `form.name` (project ID) and `form.serverType`
+- Port form uses responsive grid layout: `grid-cols-1 sm:grid-cols-2` for Server Type and Project ID fields
+- Port number section uses `flex-col lg:flex-row` with `lg:w-2/5` for input and `lg:flex-1` for dropdown
+- Port checker uses `lsof -i:${port} -sTCP:LISTEN -t` to get only listening processes
+- Project name resolution handles both new format (project ID) and legacy format (server slug like "portfolio Frontend")
+- Form validation ensures project ID exists before allowing port creation/update
+
+---
+
 ## [1.1.2] - 2025-01-XX
 
 ### Changed
