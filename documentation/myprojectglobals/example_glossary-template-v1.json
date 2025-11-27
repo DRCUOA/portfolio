@@ -1,0 +1,25 @@
+{
+  "entries": [
+    {
+      "term": "Example Term",
+      "definition": "This is an example definition of the term.",
+      "example": "Here is an example of how to use this term in context.",
+      "resource": "https://example.com/resource-link",
+      "context": "General"
+    },
+    {
+      "term": "Another Term",
+      "definition": "Another example definition.",
+      "example": null,
+      "resource": null,
+      "context": null
+    },
+    {
+      "term": "action",
+      "definition": "A method that commits mutations in Vuex/Pinia stores.",
+      "example": "const actions = { increment: ({ commit }) => commit('increment') }",
+      "resource": "https://vuex.vuejs.org/guide/actions.html",
+      "context": "Vue.js"
+    }
+  ]
+}
