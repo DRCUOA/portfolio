@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PortModel, CreatePortInput, UpdatePortInput, ServerType } from '../models/Port';
-import { isPortInUse } from '../utils/portChecker';
+import { ProjectModel } from '../models/Project';
+import { getPortStatus } from '../utils/portChecker';
 
 export class PortController {
   // GET /api/ports
@@ -10,12 +11,13 @@ export class PortController {
       // Check port availability for each port
       const portsWithStatus = await Promise.all(
         ports.map(async (port) => {
-          const inUse = await isPortInUse(port.portNumber);
+          const status = await getPortStatus(port.portNumber);
           return {
             ...port,
             name: port.name || '',
             description: port.description || '',
-            inUse,
+            inUse: status.inUse,
+            pid: status.pid,
           };
         })
       );
@@ -37,12 +39,13 @@ export class PortController {
         return;
       }
 
-      const inUse = await isPortInUse(port.portNumber);
+      const status = await getPortStatus(port.portNumber);
       res.json({
         ...port,
         name: port.name || '',
         description: port.description || '',
-        inUse,
+        inUse: status.inUse,
+        pid: status.pid,
       });
     } catch (error) {
       console.error('Error fetching port:', error);
@@ -61,12 +64,13 @@ export class PortController {
       const ports = PortModel.findByServerType(serverType as ServerType);
       const portsWithStatus = await Promise.all(
         ports.map(async (port) => {
-          const inUse = await isPortInUse(port.portNumber);
+          const status = await getPortStatus(port.portNumber);
           return {
             ...port,
             name: port.name || '',
             description: port.description || '',
-            inUse,
+            inUse: status.inUse,
+            pid: status.pid,
           };
         })
       );
@@ -110,13 +114,23 @@ export class PortController {
         return;
       }
 
+      // Validate that name (if provided) must be an existing project ID
+      if (data.name && data.name.trim() !== '') {
+        const project = ProjectModel.findById(data.name.trim());
+        if (!project) {
+          res.status(400).json({ error: `NAME must be an existing project ID. Project with ID "${data.name}" not found.` });
+          return;
+        }
+      }
+
       const port = PortModel.create(data);
-      const inUse = await isPortInUse(port.portNumber);
+      const status = await getPortStatus(port.portNumber);
       res.status(201).json({
         ...port,
         name: port.name || '',
         description: port.description || '',
-        inUse,
+        inUse: status.inUse,
+        pid: status.pid,
       });
     } catch (error) {
       console.error('Error creating port:', error);
@@ -156,18 +170,30 @@ export class PortController {
         }
       }
 
+      // Validate that name (if provided) must be an existing project ID
+      if (data.name !== undefined) {
+        if (data.name && data.name.trim() !== '') {
+          const project = ProjectModel.findById(data.name.trim());
+          if (!project) {
+            res.status(400).json({ error: `NAME must be an existing project ID. Project with ID "${data.name}" not found.` });
+            return;
+          }
+        }
+      }
+
       const updated = PortModel.update(id, data);
       if (!updated) {
         res.status(500).json({ error: 'Failed to update port' });
         return;
       }
 
-      const inUse = await isPortInUse(updated.portNumber);
+      const status = await getPortStatus(updated.portNumber);
       res.json({
         ...updated,
         name: updated.name || '',
         description: updated.description || '',
-        inUse,
+        inUse: status.inUse,
+        pid: status.pid,
       });
     } catch (error) {
       console.error('Error updating port:', error);

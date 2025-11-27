@@ -51,8 +51,8 @@
         <!-- Search Filter -->
         <div class="mb-6">
           <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-xl p-4 transition-colors">
-            <div class="flex items-center gap-4">
-              <div class="flex-1 relative">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+              <div class="flex-1 relative w-full md:w-auto">
                 <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -63,12 +63,52 @@
                   class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
                 />
               </div>
+              
+              <!-- Project Status Filter -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-sm font-medium text-gray-700 dark:text-slate-300 whitespace-nowrap">Project Status:</span>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    :checked="selectedStatuses.includes('live')"
+                    @change="toggleStatus('live')"
+                    class="w-4 h-4 text-green-600 dark:text-green-400 border-gray-300 dark:border-slate-600 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                  />
+                  <span class="text-sm px-2 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 transition-colors">Live</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    :checked="selectedStatuses.includes('prototype')"
+                    @change="toggleStatus('prototype')"
+                    class="w-4 h-4 text-yellow-600 dark:text-yellow-400 border-gray-300 dark:border-slate-600 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                  />
+                  <span class="text-sm px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 transition-colors">Prototype</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    :checked="selectedStatuses.includes('archived')"
+                    @change="toggleStatus('archived')"
+                    class="w-4 h-4 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-slate-600 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                  />
+                  <span class="text-sm px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 transition-colors">Archived</span>
+                </label>
+                <button
+                  v-if="selectedStatuses.length > 0"
+                  @click="selectedStatuses = []"
+                  class="px-3 py-1 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 transition-colors"
+                >
+                  Clear
+                </button>
+              </div>
+              
               <button
                 v-if="searchQuery"
                 @click="searchQuery = ''"
                 class="px-4 py-2 text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 transition-colors"
               >
-                Clear
+                Clear Search
               </button>
             </div>
           </div>
@@ -84,7 +124,20 @@
           <div v-for="project in filteredProjects" :key="project.name" class="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-xl overflow-hidden transition-colors">
             <div class="px-6 py-4 bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
               <div class="flex items-center justify-between">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100 transition-colors">{{ project.name }}</h3>
+                <div class="flex items-center gap-3">
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100 transition-colors">{{ project.name }}</h3>
+                  <span
+                    v-if="project.status"
+                    :class="{
+                      'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300': project.status === 'live',
+                      'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300': project.status === 'prototype',
+                      'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300': project.status === 'archived'
+                    }"
+                    class="px-2 py-1 text-xs font-semibold rounded transition-colors"
+                  >
+                    {{ project.status }}
+                  </span>
+                </div>
                 <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-slate-400 transition-colors">
                   <span>Total Clicks: <strong class="text-gray-900 dark:text-slate-200">{{ project.totalClicks }}</strong></span>
                   <span>Data Transfer: <strong class="text-gray-900 dark:text-slate-200">{{ project.totalDataTransferMB.toFixed(2) }} MB</strong></span>
@@ -97,13 +150,10 @@
                 <div v-if="project.frontend" class="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
-                      <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                        FRONTEND
-                      </span>
                       <span class="text-lg font-bold text-gray-900 dark:text-slate-200 transition-colors">Port {{ project.frontend.portNumber }}</span>
                     </div>
-                    <span :class="project.frontend.inUse ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'" class="text-sm font-medium">
-                      {{ project.frontend.inUse ? 'In Use' : 'Available' }}
+                    <span :class="project.frontend.inUse ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-500'" class="text-sm font-medium">
+                      {{ project.frontend.inUse ? (project.frontend.pid ? `ACTIVE (PID: ${project.frontend.pid})` : 'ACTIVE') : 'INACTIVE' }}
                     </span>
                   </div>
                   <div class="space-y-2 text-sm text-gray-600 dark:text-slate-400 transition-colors">
@@ -135,13 +185,10 @@
                 <div v-if="project.backend" class="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
-                      <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
-                        BACKEND
-                      </span>
                       <span class="text-lg font-bold text-gray-900 dark:text-slate-200 transition-colors">Port {{ project.backend.portNumber }}</span>
                     </div>
-                    <span :class="project.backend.inUse ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'" class="text-sm font-medium">
-                      {{ project.backend.inUse ? 'In Use' : 'Available' }}
+                    <span :class="project.backend.inUse ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-500'" class="text-sm font-medium">
+                      {{ project.backend.inUse ? (project.backend.pid ? `ACTIVE (PID: ${project.backend.pid})` : 'ACTIVE') : 'INACTIVE' }}
                     </span>
                   </div>
                   <div class="space-y-2 text-sm text-gray-600 dark:text-slate-400 transition-colors">
@@ -183,20 +230,36 @@
               <thead class="bg-gray-50 dark:bg-slate-700/50">
                 <tr>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Port</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Name</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Project</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Description</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Status</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Port Status</th>
                   <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Actions</th>
                 </tr>
               </thead>
               <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                 <tr v-for="port in filteredFrontendPorts" :key="port.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-200 transition-colors">{{ port.portNumber }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-200 transition-colors">{{ port.name || '-' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-200 transition-colors">
+                    <div class="flex flex-col gap-1">
+                      <span v-if="port.name">{{ getProjectNameForPort(port) }}</span>
+                      <span v-else class="text-gray-400 dark:text-slate-500">-</span>
+                      <span
+                        v-if="getProjectStatusForPort(port)"
+                        :class="{
+                          'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300': getProjectStatusForPort(port) === 'live',
+                          'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300': getProjectStatusForPort(port) === 'prototype',
+                          'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300': getProjectStatusForPort(port) === 'archived'
+                        }"
+                        class="px-2 py-0.5 text-xs font-semibold rounded w-fit transition-colors"
+                      >
+                        {{ getProjectStatusForPort(port) }}
+                      </span>
+                    </div>
+                  </td>
                   <td class="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 transition-colors">{{ port.description || '-' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm transition-colors">
-                    <span :class="port.inUse ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'" class="font-medium">
-                      {{ port.inUse ? 'In Use' : 'Available' }}
+                    <span :class="port.inUse ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-500'" class="font-medium">
+                      {{ port.inUse ? (port.pid ? `ACTIVE (PID: ${port.pid})` : 'ACTIVE') : 'INACTIVE' }}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -233,10 +296,9 @@
               <thead class="bg-gray-50 dark:bg-slate-700/50">
                 <tr>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Port</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Type</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Name</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Project</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Description</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Status</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Port Status</th>
                   <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Actions</th>
                 </tr>
               </thead>
@@ -244,15 +306,26 @@
                 <tr v-for="port in filteredBackendPorts" :key="port.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-200 transition-colors">{{ port.portNumber }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-200 transition-colors">
-                    <span class="px-2 py-1 text-xs font-semibold rounded-full" :class="port.serverType === 'api' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'">
-                      {{ port.serverType.toUpperCase() }}
-                    </span>
+                    <div class="flex flex-col gap-1">
+                      <span v-if="port.name">{{ getProjectNameForPort(port) }}</span>
+                      <span v-else class="text-gray-400 dark:text-slate-500">-</span>
+                      <span
+                        v-if="getProjectStatusForPort(port)"
+                        :class="{
+                          'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300': getProjectStatusForPort(port) === 'live',
+                          'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300': getProjectStatusForPort(port) === 'prototype',
+                          'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300': getProjectStatusForPort(port) === 'archived'
+                        }"
+                        class="px-2 py-0.5 text-xs font-semibold rounded w-fit transition-colors"
+                      >
+                        {{ getProjectStatusForPort(port) }}
+                      </span>
+                    </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-200 transition-colors">{{ port.name || '-' }}</td>
                   <td class="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 transition-colors">{{ port.description || '-' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm transition-colors">
-                    <span :class="port.inUse ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'" class="font-medium">
-                      {{ port.inUse ? 'In Use' : 'Available' }}
+                    <span :class="port.inUse ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-500'" class="font-medium">
+                      {{ port.inUse ? (port.pid ? `ACTIVE (PID: ${port.pid})` : 'ACTIVE') : 'INACTIVE' }}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -289,7 +362,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { usePortfolioStore, type TrafficStats } from '../../stores/portfolio'
+import { usePortfolioStore, type TrafficStats, type Project } from '../../stores/portfolio'
 
 const router = useRouter()
 const store = usePortfolioStore()
@@ -298,9 +371,95 @@ const viewMode = ref<'by-type' | 'by-project'>('by-type')
 const trafficStats = ref<TrafficStats[]>([])
 const loadingStats = ref(false)
 const searchQuery = ref('')
+const selectedStatuses = ref<string[]>([])
+const projects = ref<Project[]>([])
 
-const frontendPorts = computed(() => store.ports.filter(p => p.serverType === 'frontend'))
-const backendPorts = computed(() => store.ports.filter(p => p.serverType === 'backend' || p.serverType === 'api'))
+// Get project name from port - port name may be project ID or legacy server slug format
+function getProjectNameForPort(port: any): string {
+  if (!port.name) return '-'
+  
+  // First, try to find project by ID (new format)
+  let project = projects.value.find(p => p.id === port.name)
+  if (project) return project.name
+  
+  // If not found, try to extract project slug from server slug format (legacy: "project-slug Frontend/Backend")
+  const parts = port.name.split(' ')
+  if (parts.length >= 2) {
+    const projectSlug = parts.slice(0, -1).join(' ') // Everything except last word
+    project = projects.value.find(p => p.slug === projectSlug || p.id === projectSlug)
+    if (project) return project.name
+  }
+  
+  // If still not found, try matching by slug directly
+  project = projects.value.find(p => p.slug === port.name || p.id === port.name)
+  if (project) return project.name
+  
+  // Fallback: return the port name as-is
+  return port.name
+}
+
+// Get project ID from port - port name may be project ID or legacy server slug format
+function getProjectIdForPort(port: any): string | null {
+  if (!port.name) return null
+  
+  // First, try to find project by ID (new format)
+  let project = projects.value.find(p => p.id === port.name)
+  if (project) return project.id
+  
+  // If not found, try to extract project slug from server slug format (legacy: "project-slug Frontend/Backend")
+  const parts = port.name.split(' ')
+  if (parts.length >= 2) {
+    const projectSlug = parts.slice(0, -1).join(' ') // Everything except last word
+    project = projects.value.find(p => p.slug === projectSlug || p.id === projectSlug)
+    if (project) return project.id
+  }
+  
+  // If still not found, try matching by slug directly
+  project = projects.value.find(p => p.slug === port.name || p.id === port.name)
+  if (project) return project.id
+  
+  return null
+}
+
+// Get project status for a port
+function getProjectStatusForPort(port: any): string | null {
+  if (!port.name) return null
+  
+  // First, try to find project by ID (new format)
+  let project = projects.value.find(p => p.id === port.name)
+  if (project) return project.status
+  
+  // If not found, try to extract project slug from server slug format (legacy: "project-slug Frontend/Backend")
+  const parts = port.name.split(' ')
+  if (parts.length >= 2) {
+    const projectSlug = parts.slice(0, -1).join(' ') // Everything except last word
+    project = projects.value.find(p => p.slug === projectSlug || p.id === projectSlug)
+    if (project) return project.status
+  }
+  
+  // If still not found, try matching by slug directly
+  project = projects.value.find(p => p.slug === port.name || p.id === port.name)
+  if (project) return project.status
+  
+  return null
+}
+
+// Check if port matches selected statuses
+function portMatchesStatusFilter(port: any): boolean {
+  if (selectedStatuses.value.length === 0) return true
+  const portStatus = getProjectStatusForPort(port)
+  return portStatus ? selectedStatuses.value.includes(portStatus) : false
+}
+
+const frontendPorts = computed(() => {
+  const filtered = store.ports.filter(p => p.serverType === 'frontend')
+  return filtered.filter(portMatchesStatusFilter)
+})
+
+const backendPorts = computed(() => {
+  const filtered = store.ports.filter(p => p.serverType === 'backend' || p.serverType === 'api')
+  return filtered.filter(portMatchesStatusFilter)
+})
 
 // Filter function for ports
 function matchesSearch(port: any, query: string): boolean {
@@ -314,7 +473,7 @@ function matchesSearch(port: any, query: string): boolean {
   )
 }
 
-// Filtered ports for by-type view
+// Filtered ports for by-type view (already includes status filter from frontendPorts/backendPorts)
 const filteredFrontendPorts = computed(() => {
   if (!searchQuery.value) return frontendPorts.value
   return frontendPorts.value.filter(port => matchesSearch(port, searchQuery.value))
@@ -342,15 +501,11 @@ const filteredProjects = computed(() => {
   return projectsGrouped.value.filter(project => projectMatchesSearch(project, searchQuery.value))
 })
 
-// Extract project name from port name (e.g., "portfolio Frontend" -> "portfolio")
-function extractProjectName(portName: string): string {
-  return portName.replace(/\s+(Frontend|Backend|API)$/i, '').trim()
-}
-
 // Group ports by project
 const projectsGrouped = computed(() => {
   const projectMap = new Map<string, {
     name: string
+    status: string | null
     frontend: any
     backend: any
     frontendStats: TrafficStats | null
@@ -360,11 +515,18 @@ const projectsGrouped = computed(() => {
   }>()
 
   store.ports.forEach(port => {
-    const projectName = extractProjectName(port.name || port.id)
+    if (!portMatchesStatusFilter(port)) return
     
-    if (!projectMap.has(projectName)) {
-      projectMap.set(projectName, {
+    const projectId = getProjectIdForPort(port)
+    if (!projectId) return // Skip ports without project ID
+    
+    const projectName = getProjectNameForPort(port)
+    const projectStatus = getProjectStatusForPort(port)
+    
+    if (!projectMap.has(projectId)) {
+      projectMap.set(projectId, {
         name: projectName,
+        status: projectStatus,
         frontend: null,
         backend: null,
         frontendStats: null,
@@ -374,7 +536,7 @@ const projectsGrouped = computed(() => {
       })
     }
 
-    const project = projectMap.get(projectName)!
+    const project = projectMap.get(projectId)!
     
     if (port.serverType === 'frontend') {
       project.frontend = port
@@ -419,8 +581,19 @@ watch(viewMode, () => {
   }
 })
 
+function toggleStatus(status: string) {
+  const index = selectedStatuses.value.indexOf(status)
+  if (index > -1) {
+    selectedStatuses.value.splice(index, 1)
+  } else {
+    selectedStatuses.value.push(status)
+  }
+}
+
 onMounted(async () => {
   await store.fetchPorts()
+  const fetchedProjects = await store.fetchProjects()
+  projects.value = Array.isArray(fetchedProjects) ? fetchedProjects : []
   if (viewMode.value === 'by-project') {
     await loadTrafficStats()
   }
