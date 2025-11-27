@@ -24,8 +24,8 @@ The document content is captured in two different formats, one optimized for hum
 
 | Version | Date | Component | Intent | Reasoning | Problems Solved | Goals Achieved |
 |---------|------|-----------|--------|-----------|-----------------|----------------|
+| 1.1.1 | 01/XX/25 | tv-dashboard-removal | Remove TV Dashboard view and all related code | Removed the TV Dashboard feature as it is no longer needed. This simplifies the codebase by removing unused UI components, routes, and navigation links. The removal follows the principle of keeping the codebase clean and removing features that are not actively used. All references to the TV Dashboard have been removed from the router, admin dashboard navigation, and the component file itself. | Unused feature cluttering codebase; maintenance burden for unused code | Cleaner codebase; reduced maintenance overhead; simplified admin navigation |
 | 1.1.0 | 01/XX/25 | traffic-logging | Add traffic analytics system to track clicks and data transfer | Implemented comprehensive traffic logging system to monitor user interactions and data transfer across all ports. This provides visibility into how users navigate through the portfolio and which apps receive the most traffic. The system automatically tracks API response sizes via middleware and logs clicks through router navigation guards. Traffic statistics are aggregated by port, enabling developers to understand usage patterns and optimize resource allocation. Following existing patterns, the implementation includes database model, controller, routes, Pinia store, and admin analytics views. | No visibility into user traffic patterns; inability to track which apps are most accessed; no data transfer monitoring | Traffic analytics dashboard; automatic click and data transfer tracking; aggregated statistics by port; visibility into user navigation patterns |
-| 1.1.0 | 01/XX/25 | tv-dashboard | Create cyberpunk glassmorphism TV dashboard for monitoring all apps | Built a TV-optimized dashboard view with cyberpunk aesthetic featuring animated background orbs, glassmorphism UI, and real-time metrics display. The dashboard shows projects with both frontend and backend ports unified in single tiles, displaying live traffic statistics and port status. The design uses frosted glass effects, neon accents, and animated status indicators to create an immersive monitoring experience suitable for display on a TV screen. All data is live from the port and traffic systems, ensuring accurate real-time monitoring. | No unified view of all apps; lack of visual monitoring dashboard; difficulty seeing project status at a glance | TV-optimized dashboard view; unified project display with both ports; real-time traffic metrics; immersive cyberpunk UI design |
 | 1.1.0 | 01/XX/25 | port-list-enhancements | Enhance port list with search filters and project-grouped view | Added search functionality and dual view modes to the port management interface. Users can toggle between viewing ports by server type (original view) or grouped by project (new view). The project-grouped view displays frontend and backend ports together with aggregated traffic statistics, making it easier to see the complete picture of each project's port allocation and usage. Search filters work across port numbers, names, and descriptions in both views. | Port list was difficult to navigate with many entries; no way to see project ports together; no search functionality | Search filters for quick port lookup; project-grouped view showing frontend and backend together; improved navigation and organization |
 | 1.0.3 | 01/XX/25 | port-management | Add port tracking and management system for local dev environment | Created a comprehensive port management system to track frontend and backend/api server ports in local development. This allows developers to manually allocate and track ports, preventing conflicts and providing visibility into which ports are in use. The system includes CRUD operations, port availability checking, and filtering by server type. Following existing patterns (Partition/Project management), the implementation includes database model, controller, routes, Pinia store, and admin views. Port status (in-use/available) is checked dynamically using the existing portChecker utility. | No centralized way to track port allocations for local dev servers; risk of port conflicts when running multiple services; manual tracking of ports was error-prone | Centralized port management system; visibility into port allocations; prevention of port conflicts; easy CRUD operations for port management; real-time port availability status |
 | 1.0.2 | 11/27/25 | logging | Clean up console output to focus on essential information | Removed non-error logs and prefixes to reduce console noise. The status monitor footer provides all necessary startup information, making redundant logs unnecessary. Removing concurrently prefixes eliminates visual clutter. Only error logs are retained for debugging purposes. | Console output was cluttered with startup messages and prefixed logs that duplicated footer information | Cleaner console output; footer is the single source of truth for system status; reduced log noise during development |
@@ -42,6 +42,33 @@ The document content is captured in two different formats, one optimized for hum
   "versioning": "semantic",
   "format": "reasonlog",
   "versions": [
+    {
+      "version": "1.1.1",
+      "date": "01/XX/25",
+      "reasons": [
+        {
+          "component": "tv-dashboard-removal",
+          "intent": "Remove TV Dashboard view and all related code",
+          "reasoning": "Removed the TV Dashboard feature as it is no longer needed. This simplifies the codebase by removing unused UI components, routes, and navigation links. The removal follows the principle of keeping the codebase clean and removing features that are not actively used. All references to the TV Dashboard have been removed from the router, admin dashboard navigation, and the component file itself.",
+          "problemsSolved": [
+            "Unused feature cluttering codebase",
+            "Maintenance burden for unused code"
+          ],
+          "goalsAchieved": [
+            "Cleaner codebase",
+            "Reduced maintenance overhead",
+            "Simplified admin navigation"
+          ],
+          "files": [
+            "frontend/src/views/admin/TVDashboard.vue",
+            "frontend/src/router/index.ts",
+            "frontend/src/views/admin/AdminDashboard.vue"
+          ],
+          "alternativesConsidered": [],
+          "dependencies": []
+        }
+      ]
+    },
     {
       "version": "1.1.0",
       "date": "01/XX/25",

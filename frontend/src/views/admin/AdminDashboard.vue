@@ -81,21 +81,6 @@
             <span>View Analytics →</span>
           </div>
         </router-link>
-
-        <router-link
-          to="/admin/tv"
-          class="glass-card rounded-3xl p-10 block fade-in-up"
-          style="animation-delay: 0.5s"
-        >
-          <div class="w-16 h-16 rounded-2xl glass-strong flex items-center justify-center text-white dark:text-slate-300 text-2xl font-bold mb-6 transition-colors">
-            📺
-          </div>
-          <h2 class="text-3xl font-bold text-white dark:text-slate-300 mb-4 transition-colors">TV Dashboard</h2>
-                  <p class="text-white/60 dark:text-slate-500 mb-6 font-light leading-relaxed transition-colors">Cyberpunk glassmorphism monitor view of all apps</p>
-          <div class="flex items-center text-white/60 dark:text-slate-500 text-sm font-medium transition-colors">
-            <span>View Dashboard →</span>
-          </div>
-        </router-link>
       </div>
     </div>
   </div>
