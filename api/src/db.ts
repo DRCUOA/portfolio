@@ -54,7 +54,56 @@ function initializeDb(): void {
       FOREIGN KEY (projectId) REFERENCES projects(id),
       FOREIGN KEY (partitionId) REFERENCES partitions(id)
     );
+
+    CREATE TABLE IF NOT EXISTS ports (
+      id TEXT PRIMARY KEY,
+      port_number INTEGER UNIQUE NOT NULL,
+      server_type TEXT NOT NULL CHECK(server_type IN ('frontend', 'backend', 'api')),
+      name TEXT,
+      description TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS traffic_logs (
+      id TEXT PRIMARY KEY,
+      port_id TEXT,
+      event_type TEXT NOT NULL CHECK(event_type IN ('click', 'data_transfer')),
+      amount REAL NOT NULL,
+      metadata TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (port_id) REFERENCES ports(id)
+    );
   `);
+
+  // Migration: Fix ports table schema if it was created with camelCase columns
+  try {
+    const tableInfo = db!.prepare("PRAGMA table_info(ports)").all() as any[];
+    if (tableInfo.length > 0) {
+      // Check if old camelCase columns exist
+      const hasOldColumns = tableInfo.some(col => col.name === 'portNumber' || col.name === 'serverType' || col.name === 'createdAt');
+      if (hasOldColumns) {
+        // Drop and recreate table with correct schema
+        db!.exec('DROP TABLE IF EXISTS ports');
+        db!.exec(`
+          CREATE TABLE ports (
+            id TEXT PRIMARY KEY,
+            port_number INTEGER UNIQUE NOT NULL,
+            server_type TEXT NOT NULL CHECK(server_type IN ('frontend', 'backend', 'api')),
+            name TEXT,
+            description TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+          )
+        `);
+      }
+    }
+  } catch (error: any) {
+    // Table doesn't exist yet, which is fine
+    if (!error.message.includes('no such table')) {
+      console.warn('Migration warning:', error.message);
+    }
+  }
 
   // Migration: Add nsfw column if it doesn't exist
   try {
@@ -78,11 +127,86 @@ function initializeDb(): void {
     }
   }
 
+  // Seed initial port allocations
+  seedPorts();
+
   // Check if database is empty
   const partitionCount = db!.prepare('SELECT COUNT(*) as count FROM partitions').get() as { count: number };
   
   if (partitionCount.count === 0) {
     loadSeedData();
+  }
+}
+
+function seedPorts(): void {
+  try {
+    const portCount = db!.prepare('SELECT COUNT(*) as count FROM ports').get() as { count: number };
+    
+    // Only seed if ports table is empty
+    if (portCount.count > 0) {
+      console.log(`Ports table already has ${portCount.count} entries, skipping seed`);
+      return;
+    }
+
+    console.log('Seeding initial port allocations...');
+
+    const projects = [
+      'portfolio',      // This app
+      'glass-spa',
+      'glass-spa-2',
+      'interaction-log',
+      'notes-phoneline',
+      'nsfw-project',
+      'rambulations',
+      'routine-builder',
+      'simples',
+      'sound-mixer',
+      'tutorone',
+    ];
+
+    const insertPort = db!.prepare(`
+      INSERT INTO ports (id, port_number, server_type, name, description, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    const now = new Date().toISOString();
+    let backendPort = 3000;
+    let frontendPort = 5145;
+
+    const transaction = db!.transaction(() => {
+      for (const project of projects) {
+        // Backend port
+        insertPort.run(
+          `${project}-backend`,
+          backendPort,
+          'backend',
+          `${project} Backend`,
+          `Backend server port for ${project}`,
+          now,
+          now
+        );
+
+        // Frontend port
+        insertPort.run(
+          `${project}-frontend`,
+          frontendPort,
+          'frontend',
+          `${project} Frontend`,
+          `Frontend server port for ${project}`,
+          now,
+          now
+        );
+
+        backendPort++;
+        frontendPort++;
+      }
+    });
+
+    transaction();
+    console.log(`Successfully seeded ${projects.length * 2} port allocations`);
+  } catch (error: any) {
+    console.error('Error seeding ports:', error);
+    // Don't throw - allow server to start even if seeding fails
   }
 }
 

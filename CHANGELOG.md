@@ -1,3 +1,50 @@
+## [1.1.0] - 2025-01-XX
+
+### Added
+- Traffic logging and analytics system for tracking clicks and data transfer
+- Traffic log database table with event tracking (clicks, data transfer in MB)
+- Traffic analytics admin view (`/admin/traffic`) with summary statistics
+- Automatic data transfer tracking middleware for API responses
+- Click tracking via router navigation guard
+- TV Dashboard view (`/admin/tv`) with cyberpunk glassmorphism design
+- Port list view enhancements: search filters and project-grouped view toggle
+- Project-grouped port display showing frontend and backend ports together with traffic stats
+- Traffic statistics aggregation by port with click counts and data transfer totals
+
+### Technical Details
+- Database schema: Added `traffic_logs` table with columns: id, port_id, event_type, amount, metadata, created_at
+- Traffic logging middleware tracks API response sizes automatically
+- Router guard logs clicks when navigating to project/app routes
+- Traffic stats API endpoints: `GET /api/traffic/stats`, `GET /api/traffic/logs`, `POST /api/traffic/click`
+- TV Dashboard displays projects with both frontend and backend ports in unified tiles
+- Port list supports dual view modes: by server type and by project with live traffic statistics
+
+---
+
+## [1.0.3] - 2025-01-XX
+
+### Added
+- Port management system for tracking local development server ports
+- Admin panel view for managing port allocations (`/admin/ports`)
+- Port CRUD operations (Create, Read, Update, Delete) via API endpoints
+- Port status checking (in-use/available) using portChecker utility
+- Port filtering by server type (frontend, backend, api)
+- Port attributes: port number, server type, name, description, timestamps
+- Database table `ports` with migration support
+- API endpoints: `GET /api/ports`, `GET /api/ports/:id`, `GET /api/ports/type/:serverType`, `POST /api/ports`, `PUT /api/ports/:id`, `DELETE /api/ports/:id`
+- Frontend routes: `/admin/ports`, `/admin/ports/new`, `/admin/ports/:id/edit`
+- Port management card in AdminDashboard
+
+### Technical Details
+- Database schema: Added `ports` table with columns: id, portNumber, serverType, name, description, createdAt, updatedAt
+- Server type validation: Only accepts 'frontend', 'backend', or 'api'
+- Port number validation: Must be between 1 and 65535
+- Port availability checking: Uses existing `isPortInUse` utility from portChecker
+- Port list view displays ports grouped by server type (frontend vs backend/api)
+- Port form supports creating and editing ports with all attributes
+
+---
+
 ## [1.0.2] - 2025-11-27
 
 ### Changed

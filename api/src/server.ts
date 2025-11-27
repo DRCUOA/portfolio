@@ -10,6 +10,9 @@ import partitionRoutes from './routes/partitionRoutes';
 import projectRoutes from './routes/projectRoutes';
 import projectPartitionRoutes from './routes/projectPartitionRoutes';
 import uploadRoutes from './routes/uploadRoutes';
+import portRoutes from './routes/portRoutes';
+import trafficRoutes from './routes/trafficRoutes';
+import { trafficTrackingMiddleware } from './utils/trafficLogger';
 import { printFooter } from './utils/footer';
 
 const app = express();
@@ -28,6 +31,9 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Traffic tracking middleware (must be after body parsing but before routes)
+app.use(trafficTrackingMiddleware);
+
 // Serve static files from frontend public directory (for uploaded screenshots)
 const publicDir = path.join(__dirname, '..', '..', 'frontend', 'public');
 app.use('/screenshots', express.static(path.join(publicDir, 'screenshots')));
@@ -37,6 +43,8 @@ app.use('/api/partitions', partitionRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/project-partitions', projectPartitionRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/ports', portRoutes);
+app.use('/api/traffic', trafficRoutes);
 
 // Initialize database connection
 getDb();
