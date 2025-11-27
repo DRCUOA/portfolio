@@ -1,3 +1,16 @@
+## [1.1.1] - 2025-01-XX
+
+### Removed
+- TV Dashboard view (`/admin/tv`) and all related code
+- TV Dashboard route and navigation link from admin dashboard
+
+### Technical Details
+- Removed `frontend/src/views/admin/TVDashboard.vue` component file
+- Removed TV Dashboard route (`/admin/tv`) from router configuration
+- Removed TV Dashboard navigation card from AdminDashboard view
+
+---
+
 ## [1.1.0] - 2025-01-XX
 
 ### Added
@@ -6,7 +19,6 @@
 - Traffic analytics admin view (`/admin/traffic`) with summary statistics
 - Automatic data transfer tracking middleware for API responses
 - Click tracking via router navigation guard
-- TV Dashboard view (`/admin/tv`) with cyberpunk glassmorphism design
 - Port list view enhancements: search filters and project-grouped view toggle
 - Project-grouped port display showing frontend and backend ports together with traffic stats
 - Traffic statistics aggregation by port with click counts and data transfer totals
@@ -16,7 +28,6 @@
 - Traffic logging middleware tracks API response sizes automatically
 - Router guard logs clicks when navigating to project/app routes
 - Traffic stats API endpoints: `GET /api/traffic/stats`, `GET /api/traffic/logs`, `POST /api/traffic/click`
-- TV Dashboard displays projects with both frontend and backend ports in unified tiles
 - Port list supports dual view modes: by server type and by project with live traffic statistics
 
 ---

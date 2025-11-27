@@ -11,7 +11,6 @@ import AdminProjectForm from '../views/admin/ProjectForm.vue'
 import AdminPortList from '../views/admin/PortList.vue'
 import AdminPortForm from '../views/admin/PortForm.vue'
 import AdminTrafficAnalytics from '../views/admin/TrafficAnalytics.vue'
-import AdminTVDashboard from '../views/admin/TVDashboard.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -96,11 +95,6 @@ const router = createRouter({
       path: '/admin/traffic',
       name: 'admin-traffic',
       component: AdminTrafficAnalytics,
-    },
-    {
-      path: '/admin/tv',
-      name: 'admin-tv',
-      component: AdminTVDashboard,
     },
   ],
   scrollBehavior(_to, _from, savedPosition) {
