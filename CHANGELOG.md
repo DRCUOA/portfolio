@@ -1,18 +1,29 @@
 ## [1.1.2] - 2025-01-XX
 
 ### Changed
-- Port status column header renamed from "Status" to "AVAILABILITY TO ALLOCATE" for clearer purpose
-- Port status display now shows PID (Process ID) when port is active: "Active (PID: XXXX)" instead of just "In Use"
+- Port status display changed to ACTIVE/INACTIVE with reversed color scheme (ACTIVE = green, INACTIVE = dull red)
+- Status now shows PID when port is active: "ACTIVE (PID: XXXX)" format
+- Port checker now uses `lsof` directly for more reliable port detection
+- Port form now includes intelligent port selector dropdown when creating new ports
 
 ### Added
 - PID (Process ID) tracking for active ports using lsof command (macOS/Linux)
 - Port status API responses now include optional `pid` field when port is in use
+- Port selector dropdown in create form showing entered port ± 2 ports with availability indicators
+- Available ports shown in green, unavailable/allocated ports shown in dull red and disabled
+
+### Removed
+- "AVAILABILITY TO ALLOCATE" column from port list view (functionality moved to port creation form)
 
 ### Technical Details
-- Enhanced `portChecker.ts` utility with `getPortStatus()` function that returns both `inUse` boolean and optional `pid` number
+- Enhanced `portChecker.ts` utility with `getPortStatus()` function that uses `lsof` directly for reliable detection
 - Updated `PortController.ts` to use new `getPortStatus()` function and include PID in all port API responses
 - Updated `Port` interface in frontend store to include optional `pid` field
-- Updated `PortList.vue` to display PID in status when available and changed column header
+- Updated `PortList.vue` to remove AVAILABILITY TO ALLOCATE column
+- Updated `PortForm.vue` with port selector dropdown that shows 5 ports (entered ± 2) with availability status
+- Status column: ACTIVE (green) when inUse=true, INACTIVE (dull red) when inUse=false
+- Port selector: Available ports (not in use AND not allocated) shown in green, unavailable ports shown in dull red and disabled
+- PID display format: "ACTIVE (PID: XXXX)" consistent across frontend and backend views
 - PID retrieval uses `lsof -ti:PORT` command for cross-platform compatibility (macOS/Linux)
 
 ---

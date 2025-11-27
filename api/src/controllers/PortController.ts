@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PortModel, CreatePortInput, UpdatePortInput, ServerType } from '../models/Port';
+import { ProjectModel } from '../models/Project';
 import { getPortStatus } from '../utils/portChecker';
 
 export class PortController {
@@ -113,6 +114,15 @@ export class PortController {
         return;
       }
 
+      // Validate that name (if provided) must be an existing project ID
+      if (data.name && data.name.trim() !== '') {
+        const project = ProjectModel.findById(data.name.trim());
+        if (!project) {
+          res.status(400).json({ error: `NAME must be an existing project ID. Project with ID "${data.name}" not found.` });
+          return;
+        }
+      }
+
       const port = PortModel.create(data);
       const status = await getPortStatus(port.portNumber);
       res.status(201).json({
@@ -157,6 +167,17 @@ export class PortController {
         if (existingPort && existingPort.id !== id) {
           res.status(409).json({ error: 'Port number already in use' });
           return;
+        }
+      }
+
+      // Validate that name (if provided) must be an existing project ID
+      if (data.name !== undefined) {
+        if (data.name && data.name.trim() !== '') {
+          const project = ProjectModel.findById(data.name.trim());
+          if (!project) {
+            res.status(400).json({ error: `NAME must be an existing project ID. Project with ID "${data.name}" not found.` });
+            return;
+          }
         }
       }
 

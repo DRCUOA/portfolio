@@ -12,3 +12,4 @@ router.delete('/logs/:id', TrafficController.deleteLog);
 export default router;
 
 
+

@@ -27,25 +27,27 @@ export function isPortInUse(port: number): Promise<boolean> {
 }
 
 export async function getPortStatus(port: number): Promise<PortStatus> {
-  const inUse = await isPortInUse(port);
-  
-  if (!inUse) {
-    return { inUse: false };
-  }
-
-  // Try to get PID using lsof (works on macOS and Linux)
+  // Use lsof to find the process LISTENING on the port (not client connections)
   try {
-    const { stdout } = await execAsync(`lsof -ti:${port}`);
-    const pid = parseInt(stdout.trim(), 10);
-    if (!isNaN(pid)) {
-      return { inUse: true, pid };
+    // Get detailed info to filter for LISTEN state only
+    const { stdout } = await execAsync(`lsof -i:${port} -sTCP:LISTEN -t`);
+    const pidStr = stdout.trim();
+    if (pidStr) {
+      // lsof -t returns only PIDs, one per line
+      // Take the first one (there should typically be only one listener)
+      const pid = parseInt(pidStr.split('\n')[0], 10);
+      if (!isNaN(pid)) {
+        return { inUse: true, pid };
+      }
     }
+    // No process found listening on port
+    return { inUse: false };
   } catch (error) {
-    // If lsof fails or no process found, just return inUse status
-    // This is expected if the port is in use but we can't get PID
+    // If lsof fails or no listener found, fall back to net binding check
+    // This handles cases where lsof might not be available
+    const inUse = await isPortInUse(port);
+    return { inUse };
   }
-
-  return { inUse: true };
 }
 
 
