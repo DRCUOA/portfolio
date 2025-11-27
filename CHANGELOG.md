@@ -1,3 +1,19 @@
+## [1.0.2] - 2025-11-27
+
+### Changed
+- Removed log prefixes from concurrently command (removed `-n` and `-c` flags)
+- Removed non-error startup logs from frontend Vite configuration
+- Removed non-error shutdown logs from backend server
+- Renamed `dev` script to `dev:full` in package.json
+
+### Technical Details
+- Removed `log-config` Vite plugin that displayed frontend startup information
+- Removed console.log statements from graceful shutdown handler (kept only error logs)
+- Updated concurrently command to remove name prefixes and color coding
+- Console output now limited to error messages and status monitor footer
+
+---
+
 ### Added
 - NSFW content flag for projects with comprehensive warning modal system
 - NSFW toggle in admin ProjectForm with enhanced visual styling and dynamic feedback

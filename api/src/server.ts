@@ -55,20 +55,15 @@ const server = app.listen(PORT, () => {
 
 // Graceful shutdown handler
 function gracefulShutdown(signal: string) {
-  console.log(`\n${signal} received. Shutting down gracefully...`);
-  
   server.close((err) => {
     if (err) {
       console.error('Error closing server:', err);
       process.exit(1);
     }
     
-    console.log('HTTP server closed');
-    
     // Close database connection
     closeDb();
     
-    console.log('Shutdown complete');
     process.exit(0);
   });
   
