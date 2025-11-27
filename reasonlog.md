@@ -24,6 +24,7 @@ The document content is captured in two different formats, one optimized for hum
 
 | Version | Date | Component | Intent | Reasoning | Problems Solved | Goals Achieved |
 |---------|------|-----------|--------|-----------|-----------------|----------------|
+| 1.1.2 | 01/XX/25 | port-status-enhancement | Enhance port status tracking with PID display and improved column labeling | Improved port status tracking by adding PID (Process ID) information when ports are active, enabling developers to identify which process is using a port. Changed the status column header from "Status" to "AVAILABILITY TO ALLOCATE" to better reflect the purpose of the column. When a port is active, the status now displays "Active (PID: XXXX)" instead of just "In Use", providing actionable information for debugging and process management. The PID is retrieved using the lsof command on macOS/Linux systems. This enhancement maintains backward compatibility while providing more useful information for port management. | Limited visibility into which process is using a port; unclear column purpose; status display lacked actionable information | PID display for active ports; clearer column labeling; improved debugging capabilities; better process identification |
 | 1.1.1 | 01/XX/25 | tv-dashboard-removal | Remove TV Dashboard view and all related code | Removed the TV Dashboard feature as it is no longer needed. This simplifies the codebase by removing unused UI components, routes, and navigation links. The removal follows the principle of keeping the codebase clean and removing features that are not actively used. All references to the TV Dashboard have been removed from the router, admin dashboard navigation, and the component file itself. | Unused feature cluttering codebase; maintenance burden for unused code | Cleaner codebase; reduced maintenance overhead; simplified admin navigation |
 | 1.1.0 | 01/XX/25 | traffic-logging | Add traffic analytics system to track clicks and data transfer | Implemented comprehensive traffic logging system to monitor user interactions and data transfer across all ports. This provides visibility into how users navigate through the portfolio and which apps receive the most traffic. The system automatically tracks API response sizes via middleware and logs clicks through router navigation guards. Traffic statistics are aggregated by port, enabling developers to understand usage patterns and optimize resource allocation. Following existing patterns, the implementation includes database model, controller, routes, Pinia store, and admin analytics views. | No visibility into user traffic patterns; inability to track which apps are most accessed; no data transfer monitoring | Traffic analytics dashboard; automatic click and data transfer tracking; aggregated statistics by port; visibility into user navigation patterns |
 | 1.1.0 | 01/XX/25 | port-list-enhancements | Enhance port list with search filters and project-grouped view | Added search functionality and dual view modes to the port management interface. Users can toggle between viewing ports by server type (original view) or grouped by project (new view). The project-grouped view displays frontend and backend ports together with aggregated traffic statistics, making it easier to see the complete picture of each project's port allocation and usage. Search filters work across port numbers, names, and descriptions in both views. | Port list was difficult to navigate with many entries; no way to see project ports together; no search functionality | Search filters for quick port lookup; project-grouped view showing frontend and backend together; improved navigation and organization |
@@ -42,6 +43,36 @@ The document content is captured in two different formats, one optimized for hum
   "versioning": "semantic",
   "format": "reasonlog",
   "versions": [
+    {
+      "version": "1.1.2",
+      "date": "01/XX/25",
+      "reasons": [
+        {
+          "component": "port-status-enhancement",
+          "intent": "Enhance port status tracking with PID display and improved column labeling",
+          "reasoning": "Improved port status tracking by adding PID (Process ID) information when ports are active, enabling developers to identify which process is using a port. Changed the status column header from 'Status' to 'AVAILABILITY TO ALLOCATE' to better reflect the purpose of the column. When a port is active, the status now displays 'Active (PID: XXXX)' instead of just 'In Use', providing actionable information for debugging and process management. The PID is retrieved using the lsof command on macOS/Linux systems. This enhancement maintains backward compatibility while providing more useful information for port management.",
+          "problemsSolved": [
+            "Limited visibility into which process is using a port",
+            "Unclear column purpose",
+            "Status display lacked actionable information"
+          ],
+          "goalsAchieved": [
+            "PID display for active ports",
+            "Clearer column labeling",
+            "Improved debugging capabilities",
+            "Better process identification"
+          ],
+          "files": [
+            "api/src/utils/portChecker.ts",
+            "api/src/controllers/PortController.ts",
+            "frontend/src/stores/portfolio.ts",
+            "frontend/src/views/admin/PortList.vue"
+          ],
+          "alternativesConsidered": [],
+          "dependencies": []
+        }
+      ]
+    },
     {
       "version": "1.1.1",
       "date": "01/XX/25",

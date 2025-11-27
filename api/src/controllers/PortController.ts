@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PortModel, CreatePortInput, UpdatePortInput, ServerType } from '../models/Port';
-import { isPortInUse } from '../utils/portChecker';
+import { getPortStatus } from '../utils/portChecker';
 
 export class PortController {
   // GET /api/ports
@@ -10,12 +10,13 @@ export class PortController {
       // Check port availability for each port
       const portsWithStatus = await Promise.all(
         ports.map(async (port) => {
-          const inUse = await isPortInUse(port.portNumber);
+          const status = await getPortStatus(port.portNumber);
           return {
             ...port,
             name: port.name || '',
             description: port.description || '',
-            inUse,
+            inUse: status.inUse,
+            pid: status.pid,
           };
         })
       );
@@ -37,12 +38,13 @@ export class PortController {
         return;
       }
 
-      const inUse = await isPortInUse(port.portNumber);
+      const status = await getPortStatus(port.portNumber);
       res.json({
         ...port,
         name: port.name || '',
         description: port.description || '',
-        inUse,
+        inUse: status.inUse,
+        pid: status.pid,
       });
     } catch (error) {
       console.error('Error fetching port:', error);
@@ -61,12 +63,13 @@ export class PortController {
       const ports = PortModel.findByServerType(serverType as ServerType);
       const portsWithStatus = await Promise.all(
         ports.map(async (port) => {
-          const inUse = await isPortInUse(port.portNumber);
+          const status = await getPortStatus(port.portNumber);
           return {
             ...port,
             name: port.name || '',
             description: port.description || '',
-            inUse,
+            inUse: status.inUse,
+            pid: status.pid,
           };
         })
       );
@@ -111,12 +114,13 @@ export class PortController {
       }
 
       const port = PortModel.create(data);
-      const inUse = await isPortInUse(port.portNumber);
+      const status = await getPortStatus(port.portNumber);
       res.status(201).json({
         ...port,
         name: port.name || '',
         description: port.description || '',
-        inUse,
+        inUse: status.inUse,
+        pid: status.pid,
       });
     } catch (error) {
       console.error('Error creating port:', error);
@@ -162,12 +166,13 @@ export class PortController {
         return;
       }
 
-      const inUse = await isPortInUse(updated.portNumber);
+      const status = await getPortStatus(updated.portNumber);
       res.json({
         ...updated,
         name: updated.name || '',
         description: updated.description || '',
-        inUse,
+        inUse: status.inUse,
+        pid: status.pid,
       });
     } catch (error) {
       console.error('Error updating port:', error);

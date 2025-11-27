@@ -103,7 +103,7 @@
                       <span class="text-lg font-bold text-gray-900 dark:text-slate-200 transition-colors">Port {{ project.frontend.portNumber }}</span>
                     </div>
                     <span :class="project.frontend.inUse ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'" class="text-sm font-medium">
-                      {{ project.frontend.inUse ? 'In Use' : 'Available' }}
+                      {{ project.frontend.inUse ? (project.frontend.pid ? `Active (PID: ${project.frontend.pid})` : 'In Use') : 'Available' }}
                     </span>
                   </div>
                   <div class="space-y-2 text-sm text-gray-600 dark:text-slate-400 transition-colors">
@@ -141,7 +141,7 @@
                       <span class="text-lg font-bold text-gray-900 dark:text-slate-200 transition-colors">Port {{ project.backend.portNumber }}</span>
                     </div>
                     <span :class="project.backend.inUse ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'" class="text-sm font-medium">
-                      {{ project.backend.inUse ? 'In Use' : 'Available' }}
+                      {{ project.backend.inUse ? (project.backend.pid ? `Active (PID: ${project.backend.pid})` : 'In Use') : 'Available' }}
                     </span>
                   </div>
                   <div class="space-y-2 text-sm text-gray-600 dark:text-slate-400 transition-colors">
@@ -185,7 +185,7 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Port</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Name</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Description</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Status</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">AVAILABILITY TO ALLOCATE</th>
                   <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Actions</th>
                 </tr>
               </thead>
@@ -196,7 +196,7 @@
                   <td class="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 transition-colors">{{ port.description || '-' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm transition-colors">
                     <span :class="port.inUse ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'" class="font-medium">
-                      {{ port.inUse ? 'In Use' : 'Available' }}
+                      {{ port.inUse ? (port.pid ? `Active (PID: ${port.pid})` : 'In Use') : 'Available' }}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -236,7 +236,7 @@
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Type</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Name</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Description</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Status</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">AVAILABILITY TO ALLOCATE</th>
                   <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Actions</th>
                 </tr>
               </thead>
@@ -252,7 +252,7 @@
                   <td class="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 transition-colors">{{ port.description || '-' }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm transition-colors">
                     <span :class="port.inUse ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'" class="font-medium">
-                      {{ port.inUse ? 'In Use' : 'Available' }}
+                      {{ port.inUse ? (port.pid ? `Active (PID: ${port.pid})` : 'In Use') : 'Available' }}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

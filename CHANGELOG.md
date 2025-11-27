@@ -1,3 +1,21 @@
+## [1.1.2] - 2025-01-XX
+
+### Changed
+- Port status column header renamed from "Status" to "AVAILABILITY TO ALLOCATE" for clearer purpose
+- Port status display now shows PID (Process ID) when port is active: "Active (PID: XXXX)" instead of just "In Use"
+
+### Added
+- PID (Process ID) tracking for active ports using lsof command (macOS/Linux)
+- Port status API responses now include optional `pid` field when port is in use
+
+### Technical Details
+- Enhanced `portChecker.ts` utility with `getPortStatus()` function that returns both `inUse` boolean and optional `pid` number
+- Updated `PortController.ts` to use new `getPortStatus()` function and include PID in all port API responses
+- Updated `Port` interface in frontend store to include optional `pid` field
+- Updated `PortList.vue` to display PID in status when available and changed column header
+- PID retrieval uses `lsof -ti:PORT` command for cross-platform compatibility (macOS/Linux)
+
+---
 ## [1.1.1] - 2025-01-XX
 
 ### Removed

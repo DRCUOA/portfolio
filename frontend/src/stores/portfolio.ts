@@ -637,6 +637,7 @@ export interface Port {
   createdAt: string
   updatedAt: string
   inUse?: boolean
+  pid?: number
 }
 
 export interface CreatePortInput {
