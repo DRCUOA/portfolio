@@ -13,23 +13,7 @@ export default defineConfig(({ mode }) => {
   const frontendPort = parseInt(env.FRONTEND_PORT || '5173', 10)
 
   return {
-    plugins: [
-      vue(),
-      {
-        name: 'log-config',
-        configureServer(server) {
-          server.httpServer?.once('listening', () => {
-            console.log('='.repeat(50));
-            console.log('Frontend Dev Server Started');
-            console.log('='.repeat(50));
-            console.log(`Port: ${frontendPort}`);
-            console.log(`Frontend URL: http://localhost:${frontendPort}`);
-            console.log(`API Base URL: ${apiBaseUrl}`);
-            console.log('='.repeat(50));
-          });
-        }
-      }
-    ],
+    plugins: [vue()],
     // Tell Vite to look for .env files in the root directory
     envDir: rootDir,
     server: {

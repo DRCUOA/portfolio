@@ -10,6 +10,7 @@ import partitionRoutes from './routes/partitionRoutes';
 import projectRoutes from './routes/projectRoutes';
 import projectPartitionRoutes from './routes/projectPartitionRoutes';
 import uploadRoutes from './routes/uploadRoutes';
+import { printFooter } from './utils/footer';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,31 +43,27 @@ getDb();
 
 // Start server and store the server instance
 const server = app.listen(PORT, () => {
-  console.log('='.repeat(55));
-  console.log('Backend API Server Started');
-  console.log('='.repeat(55));
-  console.log(`Port: ${PORT}`);
-  console.log(`🌐 CORS Origins: ${corsOrigins.join(', ')}`);
-  console.log(` Server URL: http://localhost:${PORT}`);
-  console.log('='.repeat(55));
+  // Determine frontend status for footer
+  const frontendStatus = process.env.DEV_FULL === 'true' ? 'active' : 'INACTIVE';
+  
+  // Print footer as last output
+  printFooter({ 
+    backendStatus: 'active', 
+    frontendStatus 
+  });
 });
 
 // Graceful shutdown handler
 function gracefulShutdown(signal: string) {
-  console.log(`\n${signal} received. Shutting down gracefully...`);
-  
   server.close((err) => {
     if (err) {
       console.error('Error closing server:', err);
       process.exit(1);
     }
     
-    console.log('HTTP server closed');
-    
     // Close database connection
     closeDb();
     
-    console.log('Shutdown complete');
     process.exit(0);
   });
   
