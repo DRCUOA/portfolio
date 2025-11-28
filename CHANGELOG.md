@@ -1,3 +1,21 @@
+## [1.1.5] - 2025-11-28
+
+### Added
+- Partition logo images for Mental Health, Finance, Creative, and Research & Development partitions
+- Logo display functionality in PartitionList view with automatic logo mapping based on partition name/slug
+
+### Changed
+- PartitionList view now displays custom logos instead of letter symbols when logo images are available
+- Logo mapping function matches partitions to logo files based on name and slug patterns
+
+### Technical Details
+- Added 7 PNG logo files to `frontend/public/`: mental-health.png, finance.png, creative.png, researchdev.png, bafbe.png, liveexptech.png, Gemini_Generated_Image_pwpim4pwpim4pwpi.png
+- Updated `PartitionList.vue` with `getPartitionLogo()` function that maps partition names/slugs to logo files
+- Logo display uses conditional rendering: shows logo image when available, falls back to letter symbol
+- Logo images displayed in 48x48px rounded containers with overflow hidden for proper aspect ratio
+
+---
+
 ## [1.1.4] - 2025-11-28
 
 ### Fixed

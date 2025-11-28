@@ -40,7 +40,20 @@
           :style="{ animationDelay: `${index * 0.1}s` }"
         >
           <div class="flex items-start justify-between mb-4">
-            <div class="w-12 h-12 rounded-2xl glass-strong flex items-center justify-center text-white dark:text-slate-300 text-xl font-bold transition-colors">
+            <div 
+              v-if="getPartitionLogo(partition)"
+              class="w-12 h-12 rounded-2xl glass-strong flex items-center justify-center overflow-hidden transition-colors"
+            >
+              <img
+                :src="getPartitionLogo(partition)"
+                :alt="`${partition.name} logo`"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div 
+              v-else
+              class="w-12 h-12 rounded-2xl glass-strong flex items-center justify-center text-white dark:text-slate-300 text-xl font-bold transition-colors"
+            >
               {{ partition.name.charAt(0) }}
             </div>
             <div class="text-white/40 dark:text-slate-500 text-sm font-medium transition-colors">#{{ partition.sortOrder }}</div>
@@ -61,6 +74,34 @@ import { onMounted } from 'vue'
 import { usePortfolioStore } from '../stores/portfolio'
 
 const store = usePortfolioStore()
+
+// Map partition names/slugs to logo files
+const getPartitionLogo = (partition: any): string | null => {
+  const name = partition.name.toLowerCase()
+  const slug = partition.slug.toLowerCase()
+  
+  // Mental Health
+  if (name.includes('mental health') || name.includes('peer support') || slug.includes('mental-health') || slug.includes('peer-support')) {
+    return '/mental-health.png'
+  }
+  
+  // Finances
+  if (name.includes('finance') || slug.includes('finance')) {
+    return '/finance.png'
+  }
+  
+  // Creative
+  if (name.includes('creative') || slug.includes('creative')) {
+    return '/creative.png'
+  }
+  
+  // Research & Development
+  if (name.includes('research') || name.includes('r&d') || name.includes('experiments') || slug.includes('research') || slug.includes('experiments')) {
+    return '/researchdev.png'
+  }
+  
+  return null
+}
 
 onMounted(() => {
   // Scroll to top when component mounts
