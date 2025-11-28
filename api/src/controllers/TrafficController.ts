@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { TrafficLogModel, CreateTrafficLogInput } from '../models/TrafficLog';
+import { PortModel } from '../models/Port';
 import { logClick } from '../utils/trafficLogger';
 
 export class TrafficController {
@@ -8,9 +9,22 @@ export class TrafficController {
     try {
       const { portId, metadata } = req.body;
       
+      // Validate portId exists before insertion (graceful degradation)
+      let validPortId: string | null = null;
+      if (portId) {
+        const port = PortModel.findById(portId);
+        if (port) {
+          validPortId = portId;
+        } else {
+          // Port doesn't exist - set to null and log warning for debugging
+          console.warn(`Port ${portId} not found, logging traffic without port reference`);
+          validPortId = null;
+        }
+      }
+      
       const logData: CreateTrafficLogInput = {
         id: `traffic-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        portId: portId || null,
+        portId: validPortId,
         eventType: 'click',
         amount: 1,
         metadata: {
@@ -102,6 +116,8 @@ export class TrafficController {
     }
   }
 }
+
+
 
 
 
