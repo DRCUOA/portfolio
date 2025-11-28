@@ -1,3 +1,19 @@
+## [1.1.4] - 2025-11-28
+
+### Fixed
+- Fixed foreign key constraint error in traffic logging when portId doesn't exist
+- Fixed router traffic logging to use project ID instead of slug for portId construction
+- Router now fetches project by slug to get correct project ID before constructing portId
+- TrafficController now validates portId exists before insertion, gracefully handling missing ports
+
+### Technical Details
+- Router (`frontend/src/router/index.ts`): Changed from `${slug}-frontend` to `${project.id}-frontend` format by fetching project via `fetchProjectBySlug()` before constructing portId
+- TrafficController (`api/src/controllers/TrafficController.ts`): Added `PortModel.findById()` validation before inserting traffic logs; sets portId to null if port doesn't exist (graceful degradation)
+- Error handling: Router gracefully skips logging if project doesn't exist; TrafficController logs warning and continues with null portId
+- Related issue: [Bug #6: Traffic Log Foreign Key Constraint Error](documentation/gh%20issues/bugs/%236_bug_on_traffic_log.md)
+
+---
+
 ## [1.1.3] - 2025-01-XX
 
 ### Changed

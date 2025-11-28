@@ -113,22 +113,28 @@ router.beforeEach((to, _from, next) => {
   if (to.name === 'project' || to.name === 'app-store') {
     const slug = to.params.slug as string
     if (slug) {
-      // Find the port ID based on project slug
-      // Try to match project slug to port (e.g., "portfolio" -> "portfolio-frontend" or "portfolio-backend")
       const store = usePortfolioStore()
       
-      // Use frontend port for tracking clicks (users click through frontend)
-      const portId = `${slug}-frontend`
-      
-      // Log click asynchronously to not block navigation
-      setTimeout(() => {
-        store.logClick(portId, {
-          route: to.name,
-          slug,
-          path: to.path,
-          timestamp: new Date().toISOString(),
-        })
-      }, 0)
+      // Fetch project by slug to get project ID, then construct portId correctly
+      // Port IDs are now formatted as `${projectId}-${serverType}` (not using slug)
+      store.fetchProjectBySlug(slug).then((project) => {
+        if (project) {
+          // Construct portId using project ID (matching new format)
+          const portId = `${project.id}-frontend`
+          
+          // Log click asynchronously to not block navigation
+          store.logClick(portId, {
+            route: to.name,
+            slug,
+            path: to.path,
+            timestamp: new Date().toISOString(),
+          })
+        }
+        // If project doesn't exist, gracefully skip logging (no error)
+      }).catch((err) => {
+        // Silently handle errors - don't block navigation
+        console.warn('Error fetching project for traffic logging:', err)
+      })
     }
   }
   
