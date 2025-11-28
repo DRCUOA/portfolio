@@ -24,6 +24,7 @@ The document content is captured in two different formats, one optimized for hum
 
 | Version | Date | Component | Intent | Reasoning | Problems Solved | Goals Achieved |
 |---------|------|-----------|--------|-----------|-----------------|----------------|
+| 1.1.5 | 11/28/25 | partition-logo-display | Enhance partition list visual identity with custom logos | Added custom logo images for partitions and implemented automatic logo display in PartitionList view. The logo mapping function matches partition names and slugs to corresponding logo files, providing visual branding for each partition category. When a logo is available, it replaces the letter symbol, improving visual recognition and user experience. The implementation uses conditional rendering to gracefully fall back to letter symbols when logos are not available, ensuring backward compatibility. Logo images are displayed in rounded containers with proper aspect ratio handling. | Partitions displayed only with letter symbols lacked visual identity; no way to distinguish partitions visually beyond text | Custom logos for partitions; improved visual recognition; enhanced user experience; maintained backward compatibility with fallback to letter symbols |
 | 1.1.4 | 11/28/25 | traffic-logging-fix | Fix foreign key constraint errors in traffic logging system | Fixed mismatch between router portId construction (using project slug) and actual port ID format (using project ID). Router now fetches project by slug to get project ID, then constructs portId as `${project.id}-frontend` matching the corrected data model. Added backend validation in TrafficController to check if portId exists before insertion, gracefully setting portId to null if port doesn't exist. This prevents foreign key constraint failures while maintaining traffic logging functionality. Both changes handle edge cases gracefully without blocking navigation or breaking the application. Related issue: [Bug #6: Traffic Log Foreign Key Constraint Error](documentation/gh%20issues/bugs/%236_bug_on_traffic_log.md) | Foreign key constraint errors when logging traffic; router using project slug instead of project ID for portId; missing port validation before insertion | Fixed foreign key constraint errors; correct portId format matching data model; graceful handling of missing ports; no breaking changes to existing functionality |
 | 1.1.3 | 01/XX/25 | port-form-optimization | Optimize port form UX and improve data integrity | Removed manual ID field from port forms and auto-generate port ID from project ID and server type (format: `{projectId}-{serverType}`). This eliminates user error and ensures consistent ID format. Improved form layout by placing port number input and selector dropdown on same line with optimized width distribution (40% input, 60% dropdown). Added project ID validation to ensure ports can only be linked to existing projects. Enhanced port list to show project status instead of server type, providing more relevant information. Improved PID detection to only show listening processes, excluding client connections. Made form fully responsive with mobile-first breakpoints. | Manual ID entry prone to errors; inconsistent ID formats; port form not responsive; PID showing client connections; unclear project association in list view | Auto-generated consistent port IDs; improved form layout and responsiveness; data integrity through validation; clearer project status display; accurate PID detection |
 | 1.1.2 | 01/XX/25 | port-status-enhancement | Enhance port status tracking with PID display, reversed color scheme, and intelligent port selector | Improved port status tracking by adding PID (Process ID) information when ports are active, enabling developers to identify which process is using a port. Changed status display to ACTIVE/INACTIVE with reversed color scheme (ACTIVE=green, INACTIVE=dull red). Removed 'AVAILABILITY TO ALLOCATE' column from list view and moved functionality to port creation form with intelligent dropdown selector. When creating a port, entering a port number automatically shows a dropdown with that port ± 2 ports, displaying availability status (green for available, dull red for unavailable/allocated). Port checker now uses lsof directly for more reliable detection. When a port is active, the status displays 'ACTIVE (PID: XXXX)' format. This enhancement improves UX by showing availability contextually during port creation rather than cluttering the list view. | Limited visibility into which process is using a port; unclear status meaning; AVAILABILITY TO ALLOCATE column cluttered list view; unreliable port detection | PID display for active ports; clearer ACTIVE/INACTIVE status with intuitive colors; intelligent port selector in creation form; improved debugging capabilities; better process identification; more reliable port detection |
@@ -45,6 +46,39 @@ The document content is captured in two different formats, one optimized for hum
   "versioning": "semantic",
   "format": "reasonlog",
   "versions": [
+    {
+      "version": "1.1.5",
+      "date": "11/28/25",
+      "reasons": [
+        {
+          "component": "partition-logo-display",
+          "intent": "Enhance partition list visual identity with custom logos",
+          "reasoning": "Added custom logo images for partitions and implemented automatic logo display in PartitionList view. The logo mapping function matches partition names and slugs to corresponding logo files, providing visual branding for each partition category. When a logo is available, it replaces the letter symbol, improving visual recognition and user experience. The implementation uses conditional rendering to gracefully fall back to letter symbols when logos are not available, ensuring backward compatibility. Logo images are displayed in rounded containers with proper aspect ratio handling.",
+          "problemsSolved": [
+            "Partitions displayed only with letter symbols lacked visual identity",
+            "No way to distinguish partitions visually beyond text"
+          ],
+          "goalsAchieved": [
+            "Custom logos for partitions",
+            "Improved visual recognition",
+            "Enhanced user experience",
+            "Maintained backward compatibility with fallback to letter symbols"
+          ],
+          "files": [
+            "frontend/src/views/PartitionList.vue",
+            "frontend/public/mental-health.png",
+            "frontend/public/finance.png",
+            "frontend/public/creative.png",
+            "frontend/public/researchdev.png",
+            "frontend/public/bafbe.png",
+            "frontend/public/liveexptech.png",
+            "frontend/public/Gemini_Generated_Image_pwpim4pwpim4pwpi.png"
+          ],
+          "alternativesConsidered": [],
+          "dependencies": []
+        }
+      ]
+    },
     {
       "version": "1.1.4",
       "date": "11/28/25",
