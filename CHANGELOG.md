@@ -1,3 +1,15 @@
+## [1.1.6] - 2025-11-30
+
+### Changed
+- Code formatting: Added trailing newlines to end of files for consistency
+- Files updated: TrafficLog.ts, portRoutes.ts, trafficRoutes.ts, footer.ts, TrafficAnalytics.vue
+
+### Technical Details
+- Added blank lines at end of files to maintain consistent file formatting standards
+- No functional changes, formatting only
+
+---
+
 ## [1.1.5] - 2025-11-28
 
 ### Added
