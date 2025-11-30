@@ -1,111 +1,115 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors">
+  <div class="relative min-h-screen">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
-      <div class="mb-6 sm:mb-8">
-        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-slate-100 mb-2 transition-colors">
+      <div class="mb-6 sm:mb-8 fade-in-up">
+        <router-link 
+          to="/admin/ports" 
+          class="btn-glass px-5 py-2.5 rounded-2xl text-sm font-semibold mb-4 inline-flex items-center gap-2"
+        >
+          <span>←</span> Back to Ports
+        </router-link>
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl md:text-5xl font-bold text-white dark:text-slate-300 mb-2 transition-colors">
           {{ isEdit ? 'Edit Port' : 'Create New Port' }}
         </h1>
-        <router-link to="/admin/ports" class="text-sm sm:text-base text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">← Back to Ports</router-link>
       </div>
 
-      <div v-if="store.loading && !isEdit" class="text-center py-12">
-        <p class="text-gray-600 dark:text-slate-400">Loading...</p>
+      <div v-if="store.loading && !isEdit" class="text-center py-12 glass-card rounded-3xl p-8">
+        <p class="text-white/80 dark:text-slate-400">Loading...</p>
       </div>
 
-      <form v-else @submit.prevent="handleSubmit" class="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-xl p-4 sm:p-6 lg:p-8 transition-colors">
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 transition-colors">
-            Port Number <span class="text-red-500 dark:text-red-400">*</span>
-          </label>
-          <div class="flex flex-col lg:flex-row gap-4 lg:items-start">
-            <div class="lg:w-2/5 min-w-0">
-              <input
-                v-model.number="form.portNumber"
-                type="number"
-                required
-                min="1"
-                max="65535"
-                class="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
-                placeholder="e.g., 5173"
-                @input="updatePortOptions"
-              />
-              <p class="mt-1 text-xs sm:text-sm text-gray-500 dark:text-slate-400 transition-colors">Port number between 1 and 65535</p>
-            </div>
-            <div v-if="form.portNumber && form.portNumber >= 1 && form.portNumber <= 65535 && portOptions.length > 0" class="lg:flex-1 min-w-0">
-              <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 transition-colors">
-                Select from nearby ports:
-              </label>
-              <div class="relative">
-                <div
-                  class="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-700 cursor-pointer focus-within:ring-2 focus-within:ring-blue-500 dark:focus-within:ring-blue-400"
-                  @click="showDropdown = !showDropdown"
-                  tabindex="0"
-                  @blur="setTimeout(() => showDropdown = false, 200)"
-                >
-                  <div class="flex items-center justify-between">
-                    <span class="text-gray-900 dark:text-slate-100 truncate">{{ form.portNumber }}</span>
-                    <svg class="w-5 h-5 text-gray-400 transition-transform flex-shrink-0 ml-2" :class="{ 'rotate-180': showDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-                <div
-                  v-if="showDropdown"
-                  class="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-md shadow-lg max-h-60 overflow-auto"
-                >
-                  <button
-                    v-for="option in portOptions"
-                    :key="option.port"
-                    type="button"
-                    @click="selectPort(option.port)"
-                    @mousedown.prevent
-                    :disabled="!option.available"
-                    :class="[
-                      'w-full text-left px-3 py-2 text-sm transition-colors',
-                      option.available
-                        ? 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30 cursor-pointer'
-                        : 'text-red-500 dark:text-red-500 bg-red-50 dark:bg-red-900/20 opacity-60 cursor-not-allowed',
-                      option.port === form.portNumber ? 'font-semibold bg-blue-50 dark:bg-blue-900/20' : ''
-                    ]"
-                  >
-                    {{ option.port }} {{ option.available ? '(Available)' : `(${option.reason})` }}
-                  </button>
+      <form v-else @submit.prevent="handleSubmit" class="glass-card rounded-3xl p-4 sm:p-6 lg:p-8 animate-fade-in-up">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
+          <div>
+            <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">
+              Port Number <span class="text-red-400 dark:text-red-400">*</span>
+            </label>
+            <input
+              v-model.number="form.portNumber"
+              type="number"
+              required
+              min="1"
+              max="65535"
+              class="w-full px-4 py-3 text-sm sm:text-base rounded-xl glass-input transition-colors font-mono"
+              placeholder="e.g., 5173"
+              @input="updatePortOptions"
+            />
+            <p class="mt-1 text-xs sm:text-sm text-white/70 dark:text-slate-400 transition-colors">Port number between 1 and 65535</p>
+          </div>
+
+          <div v-if="form.portNumber && form.portNumber >= 1 && form.portNumber <= 65535 && portOptions.length > 0">
+            <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">
+              Select from nearby ports:
+            </label>
+            <div class="relative">
+              <div
+                class="w-full px-4 py-3 text-sm sm:text-base rounded-xl glass-input cursor-pointer transition-colors"
+                @click="showDropdown = !showDropdown"
+                tabindex="0"
+                @blur="setTimeout(() => showDropdown = false, 200)"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="text-white dark:text-slate-100 truncate font-mono">{{ form.portNumber }}</span>
+                  <svg class="w-5 h-5 text-white/60 dark:text-slate-400 transition-transform flex-shrink-0 ml-2" :class="{ 'rotate-180': showDropdown }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
                 </div>
               </div>
-              <p class="mt-1 text-xs text-gray-500 dark:text-slate-400 transition-colors">
-                <span class="text-green-600 dark:text-green-400">●</span> Available
-                <span class="ml-3 text-red-500 dark:text-red-500">●</span> Unavailable
-              </p>
+              <div
+                v-if="showDropdown"
+                class="absolute z-10 w-full mt-1 glass-strong rounded-xl shadow-lg max-h-60 overflow-auto"
+              >
+                <button
+                  v-for="option in portOptions"
+                  :key="option.port"
+                  type="button"
+                  @click="selectPort(option.port)"
+                  @mousedown.prevent
+                  :disabled="!option.available"
+                  :class="[
+                    'w-full text-left px-4 py-2 text-sm transition-colors rounded-lg',
+                    option.available
+                      ? 'text-green-200 dark:text-green-400 hover:bg-white/10 dark:hover:bg-slate-700/50 cursor-pointer'
+                      : 'text-red-300 dark:text-red-400 opacity-60 cursor-not-allowed',
+                    option.port === form.portNumber ? 'font-semibold bg-white/10 dark:bg-slate-700/50' : ''
+                  ]"
+                >
+                  <span class="font-mono">{{ option.port }}</span> {{ option.available ? '(Available)' : `(${option.reason})` }}
+                </button>
+              </div>
             </div>
+            <p class="mt-1 text-xs sm:text-sm text-white/70 dark:text-slate-400 transition-colors">
+              <span class="text-green-300 dark:text-green-400">●</span> Available
+              <span class="ml-3 text-red-300 dark:text-red-400">●</span> Unavailable
+            </p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 transition-colors">
-              Server Type <span class="text-red-500 dark:text-red-400">*</span>
+            <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">
+              Server Type <span class="text-red-400 dark:text-red-400">*</span>
             </label>
             <select
               v-model="form.serverType"
               required
-              class="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+              class="w-full px-4 py-3 text-sm sm:text-base rounded-xl glass-input transition-colors"
             >
               <option value="frontend">Frontend</option>
               <option value="backend">Backend</option>
               <option value="api">API</option>
             </select>
-            <p class="mt-1 text-xs sm:text-sm text-gray-500 dark:text-slate-400 transition-colors">Server type</p>
+            <p class="mt-1 text-xs sm:text-sm text-white/70 dark:text-slate-400 transition-colors">Server type</p>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 transition-colors">
-              Project ID <span class="text-red-500 dark:text-red-400">*</span>
+            <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">
+              Project ID <span class="text-red-400 dark:text-red-400">*</span>
             </label>
             <div class="relative">
               <select
                 v-model="form.name"
                 required
-                class="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+                class="w-full px-4 py-3 text-sm sm:text-base rounded-xl glass-input transition-colors"
               >
                 <option value="">Select a project...</option>
                 <option
@@ -117,42 +121,42 @@
                 </option>
               </select>
             </div>
-            <p class="mt-1 text-xs sm:text-sm text-gray-500 dark:text-slate-400 transition-colors">Project</p>
-            <p v-if="form.name && selectedProject" class="mt-1 text-xs text-blue-600 dark:text-blue-400 transition-colors">
+            <p class="mt-1 text-xs sm:text-sm text-white/70 dark:text-slate-400 transition-colors">Project</p>
+            <p v-if="form.name && selectedProject" class="mt-1 text-xs text-blue-300 dark:text-blue-400 transition-colors">
               Status: <span :class="{
-                'text-green-600 dark:text-green-400': selectedProject.status === 'live',
-                'text-yellow-600 dark:text-yellow-400': selectedProject.status === 'prototype',
-                'text-gray-600 dark:text-gray-400': selectedProject.status === 'archived'
+                'text-green-300 dark:text-green-400': selectedProject.status === 'live',
+                'text-yellow-300 dark:text-yellow-400': selectedProject.status === 'prototype',
+                'text-white/60 dark:text-gray-400': selectedProject.status === 'archived'
               }">{{ selectedProject.status }}</span>
             </p>
           </div>
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 transition-colors">Description</label>
+          <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">Description</label>
           <textarea
             v-model="form.description"
             rows="4"
-            class="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors resize-y"
+            class="w-full px-4 py-3 text-sm sm:text-base rounded-xl glass-input transition-colors resize-y"
             placeholder="Optional description or notes about this port"
           />
         </div>
 
-        <div v-if="error" class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded text-sm sm:text-base transition-colors">
+        <div v-if="error" class="mb-6 glass-strong rounded-xl border-red-400/30 text-red-200 dark:text-red-300 px-4 py-3 text-sm sm:text-base transition-colors">
           <p>{{ error }}</p>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-gray-200 dark:border-slate-700">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-white/10 dark:border-slate-700/50">
           <button
             type="submit"
             :disabled="store.loading"
-            class="w-full sm:w-auto bg-blue-600 dark:bg-blue-500 text-white px-6 py-2.5 text-sm sm:text-base rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors font-medium"
+            class="w-full sm:w-auto btn-glass px-6 py-3 text-sm sm:text-base rounded-xl font-semibold disabled:opacity-50 transition-all"
           >
             {{ store.loading ? 'Saving...' : (isEdit ? 'Update' : 'Create') }}
           </button>
           <router-link
             to="/admin/ports"
-            class="w-full sm:w-auto bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-200 px-6 py-2.5 text-sm sm:text-base rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors font-medium text-center"
+            class="w-full sm:w-auto btn-glass px-6 py-3 text-sm sm:text-base rounded-xl font-semibold text-center transition-all"
           >
             Cancel
           </router-link>

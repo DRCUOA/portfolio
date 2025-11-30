@@ -24,6 +24,10 @@ The document content is captured in two different formats, one optimized for hum
 
 | Version | Date | Component | Intent | Reasoning | Problems Solved | Goals Achieved |
 |---------|------|-----------|--------|-----------|-----------------|----------------|
+| 1.1.7 | 30/11/25 | admin-ui-standardization | Standardize visual language across all admin views with glassmorphism design | Standardized all admin views to use consistent glassmorphism styling from style.css. Replaced standard backgrounds with glass card effects, converted all form inputs to use glassmorphism utilities, and applied consistent button styling. This creates a cohesive visual experience matching the dashboard design. All forms and lists now have the same visual weight and hierarchy, improving user experience and maintaining design consistency across the admin panel. | Inconsistent styling across admin views; forms and lists used different visual styles; lack of cohesive design language | Consistent glassmorphism design across all admin views; unified visual language; improved user experience; professional cohesive interface |
+| 1.1.7 | 30/11/25 | project-list-enhancement | Improve project management UX with card-based layout and detail modal | Converted ProjectList from table to card-based grid layout for better visual presentation and mobile responsiveness. Added comprehensive project detail modal that displays full project information including basic info, descriptions, links, partitions, and assigned ports. Cards have fixed height with scrollable body sections for consistent alignment. Modal includes scrollable content area with fixed header and footer. This improves project overview and makes detailed information easily accessible without navigation. | Table layout was difficult to scan; no quick way to view full project details; inconsistent card heights; poor mobile experience | Card-based layout for better visual scanning; comprehensive project detail modal; consistent card alignment; improved mobile responsiveness; quick access to full project information |
+| 1.1.7 | 30/11/25 | port-display-integration | Display assigned ports in project detail modal | Added assigned ports section to project detail modal showing all ports linked to each project. Ports display with port number, server type badge, status (ACTIVE/INACTIVE with PID), description, and edit link. Section always visible with empty state showing greyed-out port icon when no ports are assigned. This provides complete project context in one view, making it easier to understand project infrastructure at a glance. | No visibility into which ports are assigned to projects; had to navigate separately to see port information | Port information integrated into project detail view; complete project context in one place; improved project infrastructure visibility |
+| 1.1.7 | 30/11/25 | form-alignment-fix | Align port form fields to match other form sections | Fixed port number input and nearby ports selector alignment to match Server Type and Project ID grid layout. Changed from flex layout to grid-cols-1 sm:grid-cols-2 structure for consistent alignment. Added font-mono to port numbers for consistent width display. This ensures all form sections have consistent visual structure and alignment, improving form usability and visual consistency. | Port number section had different layout than other form sections; inconsistent field alignment | Consistent grid layout across all form sections; aligned port number fields; improved form visual consistency |
 | 1.1.6 | 11/30/25 | code-formatting | Maintain consistent file formatting standards | Added trailing newlines to end of files to ensure consistent formatting across the codebase. This follows POSIX text file standards where files should end with a newline character. The change affects multiple TypeScript and Vue files (TrafficLog.ts, portRoutes.ts, trafficRoutes.ts, footer.ts, TrafficAnalytics.vue) to maintain consistency. This is a formatting-only change with no functional impact. | Inconsistent file endings across codebase; files missing trailing newlines | Consistent file formatting; adherence to POSIX text file standards; improved code consistency |
 | 1.1.5 | 11/28/25 | partition-logo-display | Enhance partition list visual identity with custom logos | Added custom logo images for partitions and implemented automatic logo display in PartitionList view. The logo mapping function matches partition names and slugs to corresponding logo files, providing visual branding for each partition category. When a logo is available, it replaces the letter symbol, improving visual recognition and user experience. The implementation uses conditional rendering to gracefully fall back to letter symbols when logos are not available, ensuring backward compatibility. Logo images are displayed in rounded containers with proper aspect ratio handling. | Partitions displayed only with letter symbols lacked visual identity; no way to distinguish partitions visually beyond text | Custom logos for partitions; improved visual recognition; enhanced user experience; maintained backward compatibility with fallback to letter symbols |
 | 1.1.4 | 11/28/25 | traffic-logging-fix | Fix foreign key constraint errors in traffic logging system | Fixed mismatch between router portId construction (using project slug) and actual port ID format (using project ID). Router now fetches project by slug to get project ID, then constructs portId as `${project.id}-frontend` matching the corrected data model. Added backend validation in TrafficController to check if portId exists before insertion, gracefully setting portId to null if port doesn't exist. This prevents foreign key constraint failures while maintaining traffic logging functionality. Both changes handle edge cases gracefully without blocking navigation or breaking the application. Related issue: [Bug #6: Traffic Log Foreign Key Constraint Error](documentation/gh%20issues/bugs/%236_bug_on_traffic_log.md) | Foreign key constraint errors when logging traffic; router using project slug instead of project ID for portId; missing port validation before insertion | Fixed foreign key constraint errors; correct portId format matching data model; graceful handling of missing ports; no breaking changes to existing functionality |
@@ -47,6 +51,101 @@ The document content is captured in two different formats, one optimized for hum
   "versioning": "semantic",
   "format": "reasonlog",
   "versions": [
+    {
+      "version": "1.1.7",
+      "date": "30/11/25",
+      "reasons": [
+        {
+          "component": "admin-ui-standardization",
+          "intent": "Standardize visual language across all admin views with glassmorphism design",
+          "reasoning": "Standardized all admin views to use consistent glassmorphism styling from style.css. Replaced standard backgrounds with glass card effects, converted all form inputs to use glassmorphism utilities, and applied consistent button styling. This creates a cohesive visual experience matching the dashboard design. All forms and lists now have the same visual weight and hierarchy, improving user experience and maintaining design consistency across the admin panel.",
+          "problemsSolved": [
+            "Inconsistent styling across admin views",
+            "Forms and lists used different visual styles",
+            "Lack of cohesive design language"
+          ],
+          "goalsAchieved": [
+            "Consistent glassmorphism design across all admin views",
+            "Unified visual language",
+            "Improved user experience",
+            "Professional cohesive interface"
+          ],
+          "files": [
+            "frontend/src/style.css",
+            "frontend/src/views/admin/PartitionForm.vue",
+            "frontend/src/views/admin/PartitionList.vue",
+            "frontend/src/views/admin/PortForm.vue",
+            "frontend/src/views/admin/PortList.vue",
+            "frontend/src/views/admin/ProjectForm.vue",
+            "frontend/src/views/admin/ProjectList.vue",
+            "frontend/src/views/admin/TrafficAnalytics.vue"
+          ],
+          "alternativesConsidered": [],
+          "dependencies": []
+        },
+        {
+          "component": "project-list-enhancement",
+          "intent": "Improve project management UX with card-based layout and detail modal",
+          "reasoning": "Converted ProjectList from table to card-based grid layout for better visual presentation and mobile responsiveness. Added comprehensive project detail modal that displays full project information including basic info, descriptions, links, partitions, and assigned ports. Cards have fixed height with scrollable body sections for consistent alignment. Modal includes scrollable content area with fixed header and footer. This improves project overview and makes detailed information easily accessible without navigation.",
+          "problemsSolved": [
+            "Table layout was difficult to scan",
+            "No quick way to view full project details",
+            "Inconsistent card heights",
+            "Poor mobile experience"
+          ],
+          "goalsAchieved": [
+            "Card-based layout for better visual scanning",
+            "Comprehensive project detail modal",
+            "Consistent card alignment",
+            "Improved mobile responsiveness",
+            "Quick access to full project information"
+          ],
+          "files": [
+            "frontend/src/views/admin/ProjectList.vue"
+          ],
+          "alternativesConsidered": [],
+          "dependencies": []
+        },
+        {
+          "component": "port-display-integration",
+          "intent": "Display assigned ports in project detail modal",
+          "reasoning": "Added assigned ports section to project detail modal showing all ports linked to each project. Ports display with port number, server type badge, status (ACTIVE/INACTIVE with PID), description, and edit link. Section always visible with empty state showing greyed-out port icon when no ports are assigned. This provides complete project context in one view, making it easier to understand project infrastructure at a glance.",
+          "problemsSolved": [
+            "No visibility into which ports are assigned to projects",
+            "Had to navigate separately to see port information"
+          ],
+          "goalsAchieved": [
+            "Port information integrated into project detail view",
+            "Complete project context in one place",
+            "Improved project infrastructure visibility"
+          ],
+          "files": [
+            "frontend/src/views/admin/ProjectList.vue"
+          ],
+          "alternativesConsidered": [],
+          "dependencies": []
+        },
+        {
+          "component": "form-alignment-fix",
+          "intent": "Align port form fields to match other form sections",
+          "reasoning": "Fixed port number input and nearby ports selector alignment to match Server Type and Project ID grid layout. Changed from flex layout to grid-cols-1 sm:grid-cols-2 structure for consistent alignment. Added font-mono to port numbers for consistent width display. This ensures all form sections have consistent visual structure and alignment, improving form usability and visual consistency.",
+          "problemsSolved": [
+            "Port number section had different layout than other form sections",
+            "Inconsistent field alignment"
+          ],
+          "goalsAchieved": [
+            "Consistent grid layout across all form sections",
+            "Aligned port number fields",
+            "Improved form visual consistency"
+          ],
+          "files": [
+            "frontend/src/views/admin/PortForm.vue"
+          ],
+          "alternativesConsidered": [],
+          "dependencies": []
+        }
+      ]
+    },
     {
       "version": "1.1.6",
       "date": "11/30/25",

@@ -1,63 +1,68 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors">
+  <div class="relative min-h-screen">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-900 dark:text-slate-100 mb-2 transition-colors">
+      <div class="mb-8 fade-in-up">
+        <router-link 
+          to="/admin/projects" 
+          class="btn-glass px-5 py-2.5 rounded-2xl text-sm font-semibold mb-4 inline-flex items-center gap-2"
+        >
+          <span>←</span> Back to Projects
+        </router-link>
+        <h1 class="text-4xl md:text-5xl font-bold text-white dark:text-slate-300 mb-2 transition-colors">
           {{ isEdit ? 'Edit Project' : 'Create New Project' }}
         </h1>
-        <router-link to="/admin/projects" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">← Back to Projects</router-link>
       </div>
 
-      <div v-if="loading && isEdit" class="text-center py-12">
-        <p class="text-gray-600 dark:text-slate-400">Loading...</p>
+      <div v-if="loading && isEdit" class="text-center py-12 glass-card rounded-3xl p-8">
+        <p class="text-white/80 dark:text-slate-400">Loading...</p>
       </div>
 
-      <form v-else @submit.prevent="handleSubmit" class="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-xl p-8 transition-colors">
+      <form v-else @submit.prevent="handleSubmit" class="glass-card rounded-3xl p-8 animate-fade-in-up">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              ID <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">
+              ID <span class="text-red-400 dark:text-red-400">*</span>
             </label>
             <input
               v-model="form.id"
               type="text"
               required
               :disabled="isEdit"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-100 dark:disabled:bg-slate-700 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+              class="w-full px-4 py-3 rounded-xl glass-input transition-colors"
               placeholder="e.g., my-project"
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Slug <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">
+              Slug <span class="text-red-400 dark:text-red-400">*</span>
             </label>
             <input
               v-model="form.slug"
               type="text"
               required
               :disabled="isEdit"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:bg-gray-100 dark:disabled:bg-slate-700 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+              class="w-full px-4 py-3 rounded-xl glass-input transition-colors"
               placeholder="e.g., my-project"
             />
           </div>
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            Name <span class="text-red-500">*</span>
+          <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">
+            Name <span class="text-red-400 dark:text-red-400">*</span>
           </label>
           <input
             v-model="form.name"
             type="text"
             required
-            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+            class="w-full px-4 py-3 rounded-xl glass-input transition-colors"
             placeholder="Project Name"
           />
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+          <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">
             Project Logo
           </label>
           
@@ -93,45 +98,45 @@
               type="button"
               @click="logoInput?.click()"
               :disabled="uploadingLogo"
-              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              class="btn-glass px-4 py-2 rounded-xl font-semibold disabled:opacity-50 transition-all"
             >
               {{ uploadingLogo ? 'Uploading...' : (logoPreview ? 'Change Logo' : 'Upload Logo') }}
             </button>
-            <span v-if="uploadingLogo" class="text-sm text-gray-600 dark:text-slate-400">
+            <span v-if="uploadingLogo" class="text-sm text-white/70 dark:text-slate-400">
               Uploading...
             </span>
           </div>
-          <p class="mt-1 text-sm text-gray-500 dark:text-slate-400">
+          <p class="mt-1 text-sm text-white/70 dark:text-slate-400 transition-colors">
             Upload a logo image for this project. Recommended size: 512x512px or larger, square format.
           </p>
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Tagline</label>
+          <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">Tagline</label>
           <input
             v-model="form.tagline"
             type="text"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+            class="w-full px-4 py-3 rounded-xl glass-input transition-colors"
             placeholder="Short tagline"
           />
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Short Description</label>
+          <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">Short Description</label>
           <textarea
             v-model="form.shortDescription"
             rows="3"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+            class="w-full px-4 py-3 rounded-xl glass-input transition-colors resize-y"
             placeholder="Brief description"
           />
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Long Description</label>
+          <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">Long Description</label>
           <textarea
             v-model="form.longDescription"
             rows="6"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+            class="w-full px-4 py-3 rounded-xl glass-input transition-colors resize-y"
             placeholder="Detailed description"
           />
         </div>
@@ -159,15 +164,15 @@
                 type="button"
                 @click="fileInput?.click()"
                 :disabled="uploading"
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                class="btn-glass px-4 py-2 rounded-xl font-semibold disabled:opacity-50 transition-all"
               >
                 {{ uploading ? 'Uploading...' : 'Choose Files' }}
               </button>
-              <span v-if="uploading" class="text-sm text-gray-600">
+              <span v-if="uploading" class="text-sm text-white/70 dark:text-slate-400">
                 Uploading {{ uploadProgress }}...
               </span>
             </div>
-            <p class="mt-1 text-sm text-gray-500">
+            <p class="mt-1 text-sm text-white/70 dark:text-slate-400 transition-colors">
               Select one or more image files to upload. Files will be organized by project slug.
             </p>
           </div>
@@ -240,10 +245,10 @@
             <textarea
               v-model="screenshotsInput"
               rows="4"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+              class="w-full px-4 py-3 rounded-xl glass-input font-mono text-sm transition-colors"
               placeholder="Enter screenshot URLs or local paths, one per line:&#10;&#10;Local paths:&#10;/screenshots/project-name/img1.png&#10;&#10;Remote URLs:&#10;https://example.com/screenshot1.png"
             />
-            <p class="mt-1 text-sm text-gray-500">
+            <p class="mt-1 text-sm text-white/70 dark:text-slate-400 transition-colors">
               Enter image URLs or paths, one per line. Uploaded images above will be added automatically.
             </p>
           </div>
@@ -251,13 +256,13 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Status <span class="text-red-500">*</span>
+            <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">
+              Status <span class="text-red-400 dark:text-red-400">*</span>
             </label>
             <select
               v-model="form.status"
               required
-              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+              class="w-full px-4 py-3 rounded-xl glass-input transition-colors"
             >
               <option value="live">Live</option>
               <option value="prototype">Prototype</option>
@@ -266,10 +271,10 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">In Portfolio</label>
+            <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">In Portfolio</label>
             <select
               v-model="form.inPortfolio"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+              class="w-full px-4 py-3 rounded-xl glass-input transition-colors"
             >
               <option :value="true">Yes</option>
               <option :value="false">No</option>
@@ -277,7 +282,7 @@
           </div>
         </div>
 
-        <div class="mb-6 p-4 rounded-lg border-2" :class="form.nsfw ? 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700' : 'bg-gray-50 dark:bg-slate-800/50 border-gray-200 dark:border-slate-700'">
+        <div class="mb-6 p-4 rounded-xl border-2 glass-strong" :class="form.nsfw ? 'border-red-400/30' : 'border-white/10 dark:border-slate-700/50'">
           <label class="flex items-start gap-4 cursor-pointer">
             <div class="flex-shrink-0 mt-1">
               <input
@@ -288,17 +293,17 @@
             </div>
             <div class="flex-1">
               <div class="flex items-center gap-2 mb-2">
-                <span class="text-base font-semibold" :class="form.nsfw ? 'text-red-700 dark:text-red-300' : 'text-gray-700 dark:text-slate-300'">
+                <span class="text-base font-semibold" :class="form.nsfw ? 'text-red-200 dark:text-red-300' : 'text-white dark:text-slate-300'">
                   NSFW Content
                 </span>
                 <span
                   v-if="form.nsfw"
-                  class="px-2 py-0.5 text-xs font-semibold rounded bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200"
+                  class="px-2 py-0.5 text-xs font-semibold rounded glass-strong text-red-200 dark:text-red-200"
                 >
                   Active
                 </span>
               </div>
-              <p class="text-sm" :class="form.nsfw ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-slate-400'">
+              <p class="text-sm" :class="form.nsfw ? 'text-red-200 dark:text-red-400' : 'text-white/70 dark:text-slate-400'">
                 Mark this project as containing content that may be offensive or inappropriate for users under 18 or sensitive viewers. When enabled, users will see a warning modal before viewing the project.
               </p>
             </div>
@@ -306,43 +311,43 @@
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Primary Repo URL</label>
+          <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">Primary Repo URL</label>
           <input
             v-model="form.primaryRepoUrl"
             type="url"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+            class="w-full px-4 py-3 rounded-xl glass-input transition-colors"
             placeholder="https://github.com/user/repo"
           />
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Live URL</label>
+          <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">Live URL</label>
           <input
             v-model="form.liveUrl"
             type="url"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+            class="w-full px-4 py-3 rounded-xl glass-input transition-colors"
             placeholder="https://example.com"
           />
         </div>
 
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">GitHub Repo Full Name</label>
+          <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">GitHub Repo Full Name</label>
           <input
             v-model="form.githubRepoFullName"
             type="text"
-            class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+            class="w-full px-4 py-3 rounded-xl glass-input transition-colors"
             placeholder="user/repo"
           />
         </div>
 
         <!-- Partition Management -->
-        <div class="mb-6 border-t pt-6">
-          <label class="block text-sm font-medium text-gray-700 mb-4">
+        <div class="mb-6 border-t border-white/10 dark:border-slate-700/50 pt-6">
+          <label class="block text-sm font-medium text-white dark:text-slate-300 mb-4 transition-colors">
             Partitions
           </label>
-          <p class="text-sm text-gray-500 mb-4">Select which partitions this project belongs to:</p>
+          <p class="text-sm text-white/70 dark:text-slate-400 mb-4 transition-colors">Select which partitions this project belongs to:</p>
           
-          <div v-if="loadingPartitions" class="text-sm text-gray-500 py-4">
+          <div v-if="loadingPartitions" class="text-sm text-white/70 dark:text-slate-400 py-4 transition-colors">
             Loading partitions...
           </div>
           
@@ -350,7 +355,7 @@
             <div
               v-for="partition in availablePartitions"
               :key="partition.id"
-              class="flex items-start gap-3 p-3 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
+              class="flex items-start gap-3 p-3 glass-strong rounded-xl border border-white/10 dark:border-slate-700/50 hover:bg-white/5 dark:hover:bg-slate-700/30 transition-colors"
             >
               <input
                 :id="`partition-${partition.id}`"
@@ -365,30 +370,30 @@
               >
                 <div class="flex items-center justify-between">
                   <div>
-                    <div class="font-medium text-gray-900 dark:text-slate-200">{{ partition.name }}</div>
-                    <div class="text-sm text-gray-500 dark:text-slate-400">{{ partition.description || 'No description' }}</div>
+                    <div class="font-medium text-white dark:text-slate-200 transition-colors">{{ partition.name }}</div>
+                    <div class="text-sm text-white/70 dark:text-slate-400 transition-colors">{{ partition.description || 'No description' }}</div>
                   </div>
-                  <div class="text-xs text-gray-400 dark:text-slate-500">#{{ partition.sortOrder }}</div>
+                  <div class="text-xs text-white/50 dark:text-slate-500 transition-colors">#{{ partition.sortOrder }}</div>
                 </div>
                 
                 <!-- Partition Settings (shown when checked) -->
-                <div v-if="selectedPartitions.includes(partition.id)" class="mt-3 ml-7 space-y-2 border-t pt-2">
+                <div v-if="selectedPartitions.includes(partition.id)" class="mt-3 ml-7 space-y-2 border-t border-white/10 dark:border-slate-700/50 pt-2">
                   <div class="flex items-center gap-4">
-                    <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-300">
+                    <label class="flex items-center gap-2 text-sm text-white dark:text-slate-300 transition-colors">
                       <input
                         v-model="partitionSettings[partition.id].isFeatured"
                         type="checkbox"
-                        class="h-4 w-4 text-blue-600 dark:text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 border-gray-300 dark:border-slate-600 rounded transition-colors"
+                        class="h-4 w-4 text-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 border-white/20 dark:border-slate-600 rounded transition-colors"
                       />
                       <span>Featured</span>
                     </label>
-                    <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-300">
+                    <label class="flex items-center gap-2 text-sm text-white dark:text-slate-300 transition-colors">
                       <span>Sort Order:</span>
                       <input
                         v-model.number="partitionSettings[partition.id].sortOrder"
                         type="number"
                         min="1"
-                        class="w-20 px-2 py-1 border border-gray-300 dark:border-slate-600 rounded text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+                        class="w-20 px-2 py-1 rounded-lg text-sm glass-input transition-colors"
                       />
                     </label>
                   </div>
@@ -396,27 +401,27 @@
               </label>
             </div>
             
-            <div v-if="availablePartitions.length === 0" class="text-sm text-gray-500 dark:text-slate-400 py-4">
-              No partitions available. <router-link to="/admin/partitions/new" class="text-blue-600 dark:text-blue-400 hover:underline transition-colors">Create one</router-link>
+            <div v-if="availablePartitions.length === 0" class="text-sm text-white/70 dark:text-slate-400 py-4 transition-colors">
+              No partitions available. <router-link to="/admin/partitions/new" class="text-blue-300 dark:text-blue-400 hover:underline transition-colors">Create one</router-link>
             </div>
           </div>
         </div>
 
-        <div v-if="error" class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded transition-colors">
+        <div v-if="error" class="mb-6 glass-strong rounded-xl border-red-400/30 text-red-200 dark:text-red-300 px-4 py-3 transition-colors">
           <p>{{ error }}</p>
         </div>
 
-        <div class="flex gap-4">
+        <div class="flex flex-col sm:flex-row gap-4">
           <button
             type="submit"
             :disabled="store.loading"
-            class="bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors"
+            class="btn-glass px-6 py-3 rounded-xl font-semibold disabled:opacity-50 transition-all"
           >
             {{ store.loading ? 'Saving...' : (isEdit ? 'Update' : 'Create') }}
           </button>
           <router-link
             to="/admin/projects"
-            class="bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-200 px-6 py-2 rounded hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
+            class="btn-glass px-6 py-3 rounded-xl font-semibold text-center transition-all"
           >
             Cancel
           </router-link>
@@ -432,19 +437,19 @@
         @click.self="closeLabelModal"
         @keyup.escape="closeLabelModal"
       >
-        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full p-6 transform transition-all">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-slate-100 mb-4">
+        <div class="glass-card rounded-3xl shadow-xl max-w-md w-full p-6 transform transition-all">
+          <h3 class="text-lg font-semibold text-white dark:text-slate-100 mb-4 transition-colors">
             {{ labelModalIndex >= 0 && labelModalIndex < screenshotPreviews.length && screenshotPreviews[labelModalIndex]?.label ? 'Edit Label' : 'Add Label' }}
           </h3>
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+            <label class="block text-sm font-medium text-white dark:text-slate-300 mb-2 transition-colors">
               Label (optional)
             </label>
             <input
               ref="labelInput"
               v-model="labelModalValue"
               type="text"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+              class="w-full px-4 py-3 rounded-xl glass-input transition-colors"
               placeholder="Enter a descriptive label for this screenshot"
               @keyup.enter="saveLabel"
               @keyup.escape="closeLabelModal"
@@ -454,14 +459,14 @@
             <button
               type="button"
               @click="closeLabelModal"
-              class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-800 dark:text-slate-200 rounded hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
+              class="btn-glass px-4 py-2 rounded-xl font-semibold transition-all"
             >
               Cancel
             </button>
             <button
               type="button"
               @click="saveLabel"
-              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              class="btn-glass px-4 py-2 rounded-xl font-semibold transition-all"
             >
               Save
             </button>

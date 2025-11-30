@@ -1,3 +1,35 @@
+## [1.1.7] - 2025-11-30
+
+### Added
+- Glassmorphism input utilities in style.css for consistent form styling across admin views
+- Project detail modal in ProjectList view with full project information display
+- Assigned ports section in project detail modal showing all ports linked to each project
+- Card-based layout for ProjectList view replacing table layout
+- Scrollable modal content with fixed header and footer sections
+- Empty state for ports section with greyed-out port icon when no ports assigned
+
+### Changed
+- Standardized all admin views (forms and lists) to use glassmorphism styling from style.css
+- Replaced bg-gray-50 dark:bg-slate-900 backgrounds with glass card effects
+- Applied .glass-card classes to all form containers and table wrappers
+- Converted all form inputs to use glassmorphism styling with .glass-input class
+- Applied .btn-glass to all buttons across admin views
+- Transformed standard HTML tables into glassmorphism cards with glass backgrounds
+- Added consistent hover effects and animations across all admin views
+- ProjectList view converted from table to responsive card grid (1/2/3 columns)
+- Port form layout aligned to match Server Type and Project ID grid structure
+- Modal overflow scrolling enabled for long content
+
+### Technical Details
+- Added glass-input utility classes to style.css for inputs, textareas, and selects
+- All admin forms now use consistent glassmorphism styling matching dashboard cards
+- ProjectList cards have fixed height (400px) with scrollable body section
+- Modal uses max-h-[calc(90vh-200px)] for scrollable content area
+- Port number and nearby ports selector aligned using grid-cols-1 sm:grid-cols-2 layout
+- Port numbers use font-mono for consistent alignment
+- Files updated: style.css, PartitionForm.vue, PartitionList.vue, PortForm.vue, PortList.vue, ProjectForm.vue, ProjectList.vue, TrafficAnalytics.vue
+
+---
 ## [1.1.6] - 2025-11-30
 
 ### Changed

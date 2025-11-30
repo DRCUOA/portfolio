@@ -1,18 +1,23 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors">
+  <div class="relative min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="mb-8 flex justify-between items-center">
+      <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 fade-in-up">
         <div>
-          <h1 class="text-4xl font-bold text-gray-900 dark:text-slate-100 mb-2 transition-colors">Manage Ports</h1>
-          <router-link to="/admin" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">← Back to Dashboard</router-link>
+          <router-link 
+            to="/admin" 
+            class="btn-glass px-5 py-2.5 rounded-2xl text-sm font-semibold mb-4 inline-flex items-center gap-2"
+          >
+            <span>←</span> Back to Dashboard
+          </router-link>
+          <h1 class="text-4xl md:text-5xl font-bold text-white dark:text-slate-300 mb-2 transition-colors">Manage Ports</h1>
         </div>
         <div class="flex items-center gap-4">
           <!-- View Toggle -->
-          <div class="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-lg p-1 shadow-md dark:shadow-xl transition-colors">
+          <div class="flex items-center gap-2 glass-card rounded-xl p-1 transition-colors">
             <button
               @click="viewMode = 'by-type'"
-              :class="viewMode === 'by-type' ? 'bg-blue-600 dark:bg-blue-500 text-white' : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200'"
-              class="p-2 rounded transition-colors"
+              :class="viewMode === 'by-type' ? 'bg-white/20 dark:bg-slate-700/50 text-white' : 'text-white/70 dark:text-slate-400 hover:text-white dark:hover:text-slate-200'"
+              class="p-2 rounded-lg transition-colors"
               title="View by Server Type"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,8 +26,8 @@
             </button>
             <button
               @click="viewMode = 'by-project'"
-              :class="viewMode === 'by-project' ? 'bg-blue-600 dark:bg-blue-500 text-white' : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200'"
-              class="p-2 rounded transition-colors"
+              :class="viewMode === 'by-project' ? 'bg-white/20 dark:bg-slate-700/50 text-white' : 'text-white/70 dark:text-slate-400 hover:text-white dark:hover:text-slate-200'"
+              class="p-2 rounded-lg transition-colors"
               title="View by Project"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,72 +37,72 @@
           </div>
           <router-link
             to="/admin/ports/new"
-            class="bg-green-600 dark:bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
+            class="btn-glass px-6 py-3 rounded-xl font-semibold transition-all"
           >
             + New Port
           </router-link>
         </div>
       </div>
 
-      <div v-if="store.loading" class="text-center py-12">
-        <p class="text-gray-600 dark:text-slate-400">Loading ports...</p>
+      <div v-if="store.loading" class="text-center py-12 glass-card rounded-3xl p-8 animate-fade-in-up">
+        <p class="text-white/80 dark:text-slate-400">Loading ports...</p>
       </div>
 
-      <div v-else-if="store.error" class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4 transition-colors">
+      <div v-else-if="store.error" class="glass-strong rounded-xl border-red-400/30 text-red-200 dark:text-red-300 px-4 py-3 mb-4 transition-colors animate-fade-in-up">
         <p>Error: {{ store.error }}</p>
       </div>
 
       <div v-else>
         <!-- Search Filter -->
         <div class="mb-6">
-          <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-xl p-4 transition-colors">
+          <div class="glass-card rounded-3xl p-4 transition-colors animate-fade-in-up">
             <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
               <div class="flex-1 relative w-full md:w-auto">
-                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <input
                   v-model="searchQuery"
                   type="text"
                   :placeholder="viewMode === 'by-project' ? 'Search by project name, port number...' : 'Search by port number, name, description...'"
-                  class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-slate-700 text-gray-900 dark:text-slate-100 transition-colors"
+                  class="w-full pl-12 pr-4 py-3 rounded-xl glass-input transition-colors"
                 />
               </div>
               
               <!-- Project Status Filter -->
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-sm font-medium text-gray-700 dark:text-slate-300 whitespace-nowrap">Project Status:</span>
+                <span class="text-sm font-medium text-white dark:text-slate-300 whitespace-nowrap">Project Status:</span>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     :checked="selectedStatuses.includes('live')"
                     @change="toggleStatus('live')"
-                    class="w-4 h-4 text-green-600 dark:text-green-400 border-gray-300 dark:border-slate-600 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                    class="w-4 h-4 text-green-400 border-white/20 dark:border-slate-600 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                   />
-                  <span class="text-sm px-2 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 transition-colors">Live</span>
+                  <span class="text-sm px-2 py-1 rounded glass-strong text-green-200 dark:text-green-300 transition-colors">Live</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     :checked="selectedStatuses.includes('prototype')"
                     @change="toggleStatus('prototype')"
-                    class="w-4 h-4 text-yellow-600 dark:text-yellow-400 border-gray-300 dark:border-slate-600 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                    class="w-4 h-4 text-yellow-400 border-white/20 dark:border-slate-600 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                   />
-                  <span class="text-sm px-2 py-1 rounded bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 transition-colors">Prototype</span>
+                  <span class="text-sm px-2 py-1 rounded glass-strong text-yellow-200 dark:text-yellow-300 transition-colors">Prototype</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     :checked="selectedStatuses.includes('archived')"
                     @change="toggleStatus('archived')"
-                    class="w-4 h-4 text-gray-600 dark:text-gray-400 border-gray-300 dark:border-slate-600 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                    class="w-4 h-4 text-white/60 dark:text-gray-400 border-white/20 dark:border-slate-600 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                   />
-                  <span class="text-sm px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 transition-colors">Archived</span>
+                  <span class="text-sm px-2 py-1 rounded glass-strong text-white/80 dark:text-gray-300 transition-colors">Archived</span>
                 </label>
                 <button
                   v-if="selectedStatuses.length > 0"
                   @click="selectedStatuses = []"
-                  class="px-3 py-1 text-xs text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 transition-colors"
+                  class="px-3 py-1 text-xs text-white/70 dark:text-slate-400 hover:text-white dark:hover:text-slate-200 transition-colors"
                 >
                   Clear
                 </button>
@@ -106,7 +111,7 @@
               <button
                 v-if="searchQuery"
                 @click="searchQuery = ''"
-                class="px-4 py-2 text-sm text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-200 transition-colors"
+                class="btn-glass px-4 py-2 text-sm rounded-xl font-semibold transition-all"
               >
                 Clear Search
               </button>
@@ -116,63 +121,63 @@
 
         <!-- Project Grouped View -->
         <div v-if="viewMode === 'by-project'" class="space-y-6">
-          <div v-if="filteredProjects.length === 0" class="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-xl p-12 text-center transition-colors">
-            <p class="text-gray-500 dark:text-slate-400 text-lg transition-colors">
+          <div v-if="filteredProjects.length === 0" class="glass-card rounded-3xl p-12 text-center animate-fade-in-up">
+            <p class="text-white/70 dark:text-slate-400 text-lg transition-colors">
               {{ searchQuery ? 'No projects match your search' : 'No projects configured' }}
             </p>
           </div>
-          <div v-for="project in filteredProjects" :key="project.name" class="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-xl overflow-hidden transition-colors">
-            <div class="px-6 py-4 bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-              <div class="flex items-center justify-between">
+          <div v-for="(project, index) in filteredProjects" :key="project.name" class="glass-card rounded-3xl overflow-hidden animate-fade-in-up" :style="{ animationDelay: `${index * 0.1}s` }">
+            <div class="px-6 py-4 glass-strong border-b border-white/10 dark:border-slate-700/50">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                  <h3 class="text-xl font-bold text-gray-900 dark:text-slate-100 transition-colors">{{ project.name }}</h3>
+                  <h3 class="text-xl font-bold text-white dark:text-slate-100 transition-colors">{{ project.name }}</h3>
                   <span
                     v-if="project.status"
                     :class="{
-                      'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300': project.status === 'live',
-                      'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300': project.status === 'prototype',
-                      'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300': project.status === 'archived'
+                      'glass-strong text-green-200 dark:text-green-300': project.status === 'live',
+                      'glass-strong text-yellow-200 dark:text-yellow-300': project.status === 'prototype',
+                      'glass-strong text-white/80 dark:text-gray-300': project.status === 'archived'
                     }"
                     class="px-2 py-1 text-xs font-semibold rounded transition-colors"
                   >
                     {{ project.status }}
                   </span>
                 </div>
-                <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-slate-400 transition-colors">
-                  <span>Total Clicks: <strong class="text-gray-900 dark:text-slate-200">{{ project.totalClicks }}</strong></span>
-                  <span>Data Transfer: <strong class="text-gray-900 dark:text-slate-200">{{ project.totalDataTransferMB.toFixed(2) }} MB</strong></span>
+                <div class="flex items-center gap-4 text-sm text-white/70 dark:text-slate-400 transition-colors">
+                  <span>Total Clicks: <strong class="text-white dark:text-slate-200">{{ project.totalClicks }}</strong></span>
+                  <span>Data Transfer: <strong class="text-white dark:text-slate-200">{{ project.totalDataTransferMB.toFixed(2) }} MB</strong></span>
                 </div>
               </div>
             </div>
             <div class="p-6">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Frontend Port -->
-                <div v-if="project.frontend" class="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
+                <div v-if="project.frontend" class="glass-strong rounded-xl p-4 border border-white/10 dark:border-slate-700/50">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
-                      <span class="text-lg font-bold text-gray-900 dark:text-slate-200 transition-colors">Port {{ project.frontend.portNumber }}</span>
+                      <span class="text-lg font-bold text-white dark:text-slate-200 transition-colors">Port {{ project.frontend.portNumber }}</span>
                     </div>
-                    <span :class="project.frontend.inUse ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-500'" class="text-sm font-medium">
+                    <span :class="project.frontend.inUse ? 'text-green-300 dark:text-green-400' : 'text-red-300 dark:text-red-400'" class="text-sm font-medium">
                       {{ project.frontend.inUse ? (project.frontend.pid ? `ACTIVE (PID: ${project.frontend.pid})` : 'ACTIVE') : 'INACTIVE' }}
                     </span>
                   </div>
-                  <div class="space-y-2 text-sm text-gray-600 dark:text-slate-400 transition-colors">
+                  <div class="space-y-2 text-sm text-white/70 dark:text-slate-400 transition-colors">
                     <div v-if="project.frontendStats">
-                      <span>Clicks: <strong class="text-gray-900 dark:text-slate-200">{{ project.frontendStats.totalClicks }}</strong></span>
+                      <span>Clicks: <strong class="text-white dark:text-slate-200">{{ project.frontendStats.totalClicks }}</strong></span>
                     </div>
                     <div v-if="project.frontendStats">
-                      <span>Data: <strong class="text-gray-900 dark:text-slate-200">{{ project.frontendStats.totalDataTransferMB.toFixed(2) }} MB</strong></span>
+                      <span>Data: <strong class="text-white dark:text-slate-200">{{ project.frontendStats.totalDataTransferMB.toFixed(2) }} MB</strong></span>
                     </div>
                     <div class="flex gap-2 mt-4">
                       <router-link
                         :to="`/admin/ports/${project.frontend.id}/edit`"
-                        class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm transition-colors"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                       >
                         Edit
                       </router-link>
                       <button
                         @click="handleDelete(project.frontend.id)"
-                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm transition-colors"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-red-200 dark:text-red-300 hover:text-red-100 dark:hover:text-red-200 transition-all"
                         :disabled="deleting === project.frontend.id"
                       >
                         {{ deleting === project.frontend.id ? 'Deleting...' : 'Delete' }}
@@ -182,32 +187,32 @@
                 </div>
 
                 <!-- Backend Port -->
-                <div v-if="project.backend" class="border border-gray-200 dark:border-slate-700 rounded-lg p-4">
+                <div v-if="project.backend" class="glass-strong rounded-xl p-4 border border-white/10 dark:border-slate-700/50">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
-                      <span class="text-lg font-bold text-gray-900 dark:text-slate-200 transition-colors">Port {{ project.backend.portNumber }}</span>
+                      <span class="text-lg font-bold text-white dark:text-slate-200 transition-colors">Port {{ project.backend.portNumber }}</span>
                     </div>
-                    <span :class="project.backend.inUse ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-500'" class="text-sm font-medium">
+                    <span :class="project.backend.inUse ? 'text-green-300 dark:text-green-400' : 'text-red-300 dark:text-red-400'" class="text-sm font-medium">
                       {{ project.backend.inUse ? (project.backend.pid ? `ACTIVE (PID: ${project.backend.pid})` : 'ACTIVE') : 'INACTIVE' }}
                     </span>
                   </div>
-                  <div class="space-y-2 text-sm text-gray-600 dark:text-slate-400 transition-colors">
+                  <div class="space-y-2 text-sm text-white/70 dark:text-slate-400 transition-colors">
                     <div v-if="project.backendStats">
-                      <span>Clicks: <strong class="text-gray-900 dark:text-slate-200">{{ project.backendStats.totalClicks }}</strong></span>
+                      <span>Clicks: <strong class="text-white dark:text-slate-200">{{ project.backendStats.totalClicks }}</strong></span>
                     </div>
                     <div v-if="project.backendStats">
-                      <span>Data: <strong class="text-gray-900 dark:text-slate-200">{{ project.backendStats.totalDataTransferMB.toFixed(2) }} MB</strong></span>
+                      <span>Data: <strong class="text-white dark:text-slate-200">{{ project.backendStats.totalDataTransferMB.toFixed(2) }} MB</strong></span>
                     </div>
                     <div class="flex gap-2 mt-4">
                       <router-link
                         :to="`/admin/ports/${project.backend.id}/edit`"
-                        class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm transition-colors"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
                       >
                         Edit
                       </router-link>
                       <button
                         @click="handleDelete(project.backend.id)"
-                        class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 text-sm transition-colors"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-red-200 dark:text-red-300 hover:text-red-100 dark:hover:text-red-200 transition-all"
                         :disabled="deleting === project.backend.id"
                       >
                         {{ deleting === project.backend.id ? 'Deleting...' : 'Delete' }}
@@ -224,133 +229,137 @@
         <div v-else class="space-y-8">
           <!-- Frontend Ports -->
           <div>
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-4 transition-colors">Frontend Servers</h2>
-          <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-xl overflow-hidden transition-colors">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-              <thead class="bg-gray-50 dark:bg-slate-700/50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Port</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Project</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Description</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Port Status</th>
-                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
-                <tr v-for="port in filteredFrontendPorts" :key="port.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-200 transition-colors">{{ port.portNumber }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-200 transition-colors">
-                    <div class="flex flex-col gap-1">
-                      <span v-if="port.name">{{ getProjectNameForPort(port) }}</span>
-                      <span v-else class="text-gray-400 dark:text-slate-500">-</span>
-                      <span
-                        v-if="getProjectStatusForPort(port)"
-                        :class="{
-                          'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300': getProjectStatusForPort(port) === 'live',
-                          'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300': getProjectStatusForPort(port) === 'prototype',
-                          'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300': getProjectStatusForPort(port) === 'archived'
-                        }"
-                        class="px-2 py-0.5 text-xs font-semibold rounded w-fit transition-colors"
-                      >
-                        {{ getProjectStatusForPort(port) }}
+          <h2 class="text-2xl font-bold text-white dark:text-slate-300 mb-4 transition-colors animate-fade-in-up">Frontend Servers</h2>
+          <div class="glass-card rounded-3xl overflow-hidden animate-fade-in-up">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-white/10 dark:divide-slate-700/50">
+                <thead class="glass-strong">
+                  <tr>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-white dark:text-slate-300 uppercase tracking-wider transition-colors">Port</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-white dark:text-slate-300 uppercase tracking-wider transition-colors">Project</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-white dark:text-slate-300 uppercase tracking-wider transition-colors">Description</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-white dark:text-slate-300 uppercase tracking-wider transition-colors">Port Status</th>
+                    <th class="px-6 py-4 text-right text-xs font-semibold text-white dark:text-slate-300 uppercase tracking-wider transition-colors">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10 dark:divide-slate-700/50">
+                  <tr v-for="(port, index) in filteredFrontendPorts" :key="port.id" class="hover:bg-white/5 dark:hover:bg-slate-700/30 transition-colors animate-fade-in-up" :style="{ animationDelay: `${index * 0.05}s` }">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white dark:text-slate-200 transition-colors">{{ port.portNumber }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-white dark:text-slate-200 transition-colors">
+                      <div class="flex flex-col gap-1">
+                        <span v-if="port.name">{{ getProjectNameForPort(port) }}</span>
+                        <span v-else class="text-white/50 dark:text-slate-500">-</span>
+                        <span
+                          v-if="getProjectStatusForPort(port)"
+                          :class="{
+                            'glass-strong text-green-200 dark:text-green-300': getProjectStatusForPort(port) === 'live',
+                            'glass-strong text-yellow-200 dark:text-yellow-300': getProjectStatusForPort(port) === 'prototype',
+                            'glass-strong text-white/80 dark:text-gray-300': getProjectStatusForPort(port) === 'archived'
+                          }"
+                          class="px-2 py-0.5 text-xs font-semibold rounded w-fit transition-colors"
+                        >
+                          {{ getProjectStatusForPort(port) }}
+                        </span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-white/70 dark:text-slate-400 transition-colors">{{ port.description || '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm transition-colors">
+                      <span :class="port.inUse ? 'text-green-300 dark:text-green-400' : 'text-red-300 dark:text-red-400'" class="font-medium">
+                        {{ port.inUse ? (port.pid ? `ACTIVE (PID: ${port.pid})` : 'ACTIVE') : 'INACTIVE' }}
                       </span>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 transition-colors">{{ port.description || '-' }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm transition-colors">
-                    <span :class="port.inUse ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-500'" class="font-medium">
-                      {{ port.inUse ? (port.pid ? `ACTIVE (PID: ${port.pid})` : 'ACTIVE') : 'INACTIVE' }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <router-link
-                      :to="`/admin/ports/${port.id}/edit`"
-                      class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-4 transition-colors"
-                    >
-                      Edit
-                    </router-link>
-                    <button
-                      @click="handleDelete(port.id)"
-                      class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"
-                      :disabled="deleting === port.id"
-                    >
-                      {{ deleting === port.id ? 'Deleting...' : 'Delete' }}
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="filteredFrontendPorts.length === 0">
-                  <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-slate-400 transition-colors">
-                    {{ searchQuery ? 'No frontend ports match your search' : 'No frontend ports configured' }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <router-link
+                        :to="`/admin/ports/${port.id}/edit`"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold mr-2 transition-all"
+                      >
+                        Edit
+                      </router-link>
+                      <button
+                        @click="handleDelete(port.id)"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-red-200 dark:text-red-300 hover:text-red-100 dark:hover:text-red-200 transition-all"
+                        :disabled="deleting === port.id"
+                      >
+                        {{ deleting === port.id ? 'Deleting...' : 'Delete' }}
+                      </button>
+                    </td>
+                  </tr>
+                  <tr v-if="filteredFrontendPorts.length === 0">
+                    <td colspan="5" class="px-6 py-4 text-center text-sm text-white/70 dark:text-slate-400 transition-colors">
+                      {{ searchQuery ? 'No frontend ports match your search' : 'No frontend ports configured' }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         <!-- Backend/API Ports -->
         <div>
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-slate-100 mb-4 transition-colors">Backend/API Servers</h2>
-          <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-xl overflow-hidden transition-colors">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-              <thead class="bg-gray-50 dark:bg-slate-700/50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Port</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Project</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Description</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Port Status</th>
-                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider transition-colors">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
-                <tr v-for="port in filteredBackendPorts" :key="port.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-slate-200 transition-colors">{{ port.portNumber }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-slate-200 transition-colors">
-                    <div class="flex flex-col gap-1">
-                      <span v-if="port.name">{{ getProjectNameForPort(port) }}</span>
-                      <span v-else class="text-gray-400 dark:text-slate-500">-</span>
-                      <span
-                        v-if="getProjectStatusForPort(port)"
-                        :class="{
-                          'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300': getProjectStatusForPort(port) === 'live',
-                          'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300': getProjectStatusForPort(port) === 'prototype',
-                          'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300': getProjectStatusForPort(port) === 'archived'
-                        }"
-                        class="px-2 py-0.5 text-xs font-semibold rounded w-fit transition-colors"
-                      >
-                        {{ getProjectStatusForPort(port) }}
+          <h2 class="text-2xl font-bold text-white dark:text-slate-300 mb-4 transition-colors animate-fade-in-up">Backend/API Servers</h2>
+          <div class="glass-card rounded-3xl overflow-hidden animate-fade-in-up">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-white/10 dark:divide-slate-700/50">
+                <thead class="glass-strong">
+                  <tr>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-white dark:text-slate-300 uppercase tracking-wider transition-colors">Port</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-white dark:text-slate-300 uppercase tracking-wider transition-colors">Project</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-white dark:text-slate-300 uppercase tracking-wider transition-colors">Description</th>
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-white dark:text-slate-300 uppercase tracking-wider transition-colors">Port Status</th>
+                    <th class="px-6 py-4 text-right text-xs font-semibold text-white dark:text-slate-300 uppercase tracking-wider transition-colors">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10 dark:divide-slate-700/50">
+                  <tr v-for="(port, index) in filteredBackendPorts" :key="port.id" class="hover:bg-white/5 dark:hover:bg-slate-700/30 transition-colors animate-fade-in-up" :style="{ animationDelay: `${index * 0.05}s` }">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white dark:text-slate-200 transition-colors">{{ port.portNumber }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-white dark:text-slate-200 transition-colors">
+                      <div class="flex flex-col gap-1">
+                        <span v-if="port.name">{{ getProjectNameForPort(port) }}</span>
+                        <span v-else class="text-white/50 dark:text-slate-500">-</span>
+                        <span
+                          v-if="getProjectStatusForPort(port)"
+                          :class="{
+                            'glass-strong text-green-200 dark:text-green-300': getProjectStatusForPort(port) === 'live',
+                            'glass-strong text-yellow-200 dark:text-yellow-300': getProjectStatusForPort(port) === 'prototype',
+                            'glass-strong text-white/80 dark:text-gray-300': getProjectStatusForPort(port) === 'archived'
+                          }"
+                          class="px-2 py-0.5 text-xs font-semibold rounded w-fit transition-colors"
+                        >
+                          {{ getProjectStatusForPort(port) }}
+                        </span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-white/70 dark:text-slate-400 transition-colors">{{ port.description || '-' }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm transition-colors">
+                      <span :class="port.inUse ? 'text-green-300 dark:text-green-400' : 'text-red-300 dark:text-red-400'" class="font-medium">
+                        {{ port.inUse ? (port.pid ? `ACTIVE (PID: ${port.pid})` : 'ACTIVE') : 'INACTIVE' }}
                       </span>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 text-sm text-gray-500 dark:text-slate-400 transition-colors">{{ port.description || '-' }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm transition-colors">
-                    <span :class="port.inUse ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-500'" class="font-medium">
-                      {{ port.inUse ? (port.pid ? `ACTIVE (PID: ${port.pid})` : 'ACTIVE') : 'INACTIVE' }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <router-link
-                      :to="`/admin/ports/${port.id}/edit`"
-                      class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-4 transition-colors"
-                    >
-                      Edit
-                    </router-link>
-                    <button
-                      @click="handleDelete(port.id)"
-                      class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"
-                      :disabled="deleting === port.id"
-                    >
-                      {{ deleting === port.id ? 'Deleting...' : 'Delete' }}
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="filteredBackendPorts.length === 0">
-                  <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-slate-400 transition-colors">
-                    {{ searchQuery ? 'No backend/API ports match your search' : 'No backend/API ports configured' }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <router-link
+                        :to="`/admin/ports/${port.id}/edit`"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold mr-2 transition-all"
+                      >
+                        Edit
+                      </router-link>
+                      <button
+                        @click="handleDelete(port.id)"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-red-200 dark:text-red-300 hover:text-red-100 dark:hover:text-red-200 transition-all"
+                        :disabled="deleting === port.id"
+                      >
+                        {{ deleting === port.id ? 'Deleting...' : 'Delete' }}
+                      </button>
+                    </td>
+                  </tr>
+                  <tr v-if="filteredBackendPorts.length === 0">
+                    <td colspan="6" class="px-6 py-4 text-center text-sm text-white/70 dark:text-slate-400 transition-colors">
+                      {{ searchQuery ? 'No backend/API ports match your search' : 'No backend/API ports configured' }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
         </div>
