@@ -1,3 +1,35 @@
+## [1.1.8] - 2025-12-01
+
+### Added
+- Port availability checking API endpoint (`GET /api/ports/check/:portNumber`) that checks both database allocation and runtime status
+- `checkPortAvailability` function in portfolio store for frontend port availability checks
+- Real-time port availability validation in PortForm using authoritative API
+- Enhanced port conflict detection preventing duplicate allocations per project-server type combination
+
+### Changed
+- Port creation and update validation now checks both database allocation (reserved) and runtime status (active)
+- Port form availability checking now uses authoritative API endpoint instead of local state
+- Port form refreshes port list from server before checking availability to prevent stale data
+- Port form validates availability on port number, project ID, and server type changes
+- Port form performs final availability check before submission to prevent race conditions
+- ProjectList port matching enhanced to support both new format (direct project ID) and legacy format (project-slug with server type suffix)
+- Server binding changed to localhost (127.0.0.1) for security, preventing listening on all interfaces
+- Port checker utility binds to localhost (127.0.0.1) for security
+
+### Fixed
+- Port allocation conflicts now properly detected for both new and legacy port name formats
+- Port availability checking now accounts for both reserved (DB) and active (runtime) states
+- Improved error messages showing which project reserved a port or which PID is using it
+
+### Technical Details
+- Port availability endpoint returns: available status, isReserved flag, isActive flag, reservedBy info, activePid
+- Port validation checks three conditions: reserved in DB, active at runtime, or already allocated to same project-server type
+- Legacy port format support: "project-slug Backend" or "project-slug Frontend" patterns
+- Server security: Explicit HOST binding prevents accidental exposure on all network interfaces
+- Files updated: PortController.ts, portRoutes.ts, portChecker.ts, server.ts, portfolio.ts, PortForm.vue, ProjectList.vue
+
+---
+
 ## [1.1.7] - 2025-11-30
 
 ### Added

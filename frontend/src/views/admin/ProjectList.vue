@@ -416,8 +416,36 @@ function getPartitionName(partitionId: string): string {
 }
 
 function getProjectPorts(projectId: string) {
-  // Ports are linked to projects via the port.name field which contains the project ID
-  return store.ports.filter(port => port.name === projectId)
+  // Ports are linked to projects via the port.name field
+  // New format: port.name === projectId (direct match)
+  // Legacy format: port.name === "project-slug Backend" or "project-slug Frontend"
+  // We need to check both formats
+  const project = projects.value.find(p => p.id === projectId)
+  if (!project) return []
+  
+  return store.ports.filter(port => {
+    if (!port.name) return false
+    
+    // New format: direct match with project ID
+    if (port.name === projectId) return true
+    
+    // Legacy format: "project-slug Backend" or "project-slug Frontend"
+    // Check if port name starts with project slug or project ID
+    const parts = port.name.split(' ')
+    if (parts.length >= 2) {
+      const projectIdentifier = parts.slice(0, -1).join(' ') // Everything except last word
+      if (projectIdentifier === project.slug || projectIdentifier === project.id) {
+        return true
+      }
+    }
+    
+    // Also check direct slug/id match
+    if (port.name === project.slug || port.name === project.id) {
+      return true
+    }
+    
+    return false
+  })
 }
 
 async function handleDelete(id: string) {

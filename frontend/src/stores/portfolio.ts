@@ -476,6 +476,33 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     }
   }
 
+  // Check port availability (checks both DB allocation and runtime status)
+  async function checkPortAvailability(portNumber: number): Promise<{
+    available: boolean
+    isReserved: boolean
+    isActive: boolean
+    reservedBy: { id: string; name: string; serverType: string } | null
+    activePid: number | null
+  }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/ports/check/${portNumber}`)
+      if (!response.ok) {
+        throw new Error('Failed to check port availability')
+      }
+      return await response.json()
+    } catch (err) {
+      console.error('Error checking port availability:', err)
+      // On error, assume port is not available (fail-safe)
+      return {
+        available: false,
+        isReserved: true,
+        isActive: false,
+        reservedBy: null,
+        activePid: null
+      }
+    }
+  }
+
   // Traffic Logging
   async function logClick(portId: string | null, metadata?: Record<string, any>) {
     try {
@@ -546,6 +573,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     createPort,
     updatePort,
     deletePort,
+    checkPortAvailability,
     logClick,
     fetchTrafficStats,
   }

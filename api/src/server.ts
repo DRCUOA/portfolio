@@ -50,7 +50,9 @@ app.use('/api/traffic', trafficRoutes);
 getDb();
 
 // Start server and store the server instance
-const server = app.listen(PORT, () => {
+// Explicitly bind to localhost (127.0.0.1) for security - prevents listening on all interfaces
+const HOST = process.env.HOST || '127.0.0.1';
+const server = app.listen(PORT, HOST, () => {
   // Determine frontend status for footer
   const frontendStatus = process.env.DEV_FULL === 'true' ? 'active' : 'INACTIVE';
   

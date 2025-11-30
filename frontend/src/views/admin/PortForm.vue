@@ -220,11 +220,14 @@ function selectPort(port: number) {
   updatePortOptions()
 }
 
-function updatePortOptions() {
+async function updatePortOptions() {
   if (!form.value.portNumber || form.value.portNumber < 1 || form.value.portNumber > 65535) {
     portOptions.value = []
     return
   }
+
+  // CRITICAL: Always refresh ports from server to get latest state
+  await store.fetchPorts()
 
   const basePort = form.value.portNumber
   const ports = [
@@ -235,16 +238,70 @@ function updatePortOptions() {
     basePort + 2,
   ].filter(p => p >= 1 && p <= 65535)
 
-  portOptions.value = ports.map(port => {
-    const existingPort = store.ports.find(p => p.portNumber === port)
-    const isAllocated = existingPort && existingPort.name
-    const isInUse = existingPort && existingPort.inUse
+  // Check availability for each port using authoritative API
+  portOptions.value = await Promise.all(ports.map(async (port) => {
+    // Check if this project already has a port allocated for this server type
+    const projectId = form.value.name
+    const serverType = form.value.serverType
+    let projectAlreadyHasPort = false
     
-    if (isAllocated || isInUse) {
+    if (projectId && serverType) {
+      const projectPorts = store.ports.filter(p => {
+        if (!p.name) return false
+        // New format: direct match
+        if (p.name === projectId && p.serverType === serverType) {
+          return true
+        }
+        // Legacy format: "project-slug Backend" or "project-slug Frontend"
+        const parts = p.name.split(' ')
+        if (parts.length >= 2) {
+          const projectIdentifier = parts.slice(0, -1).join(' ')
+          const serverTypeInName = parts[parts.length - 1].toLowerCase()
+          const expectedServerType = serverType === 'api' ? 'backend' : serverType
+          const selectedProject = projects.value.find(proj => proj.id === projectId)
+          if (selectedProject && 
+              (projectIdentifier === projectId || projectIdentifier === selectedProject.slug) &&
+              serverTypeInName === expectedServerType &&
+              p.serverType === serverType) {
+            return true
+          }
+        }
+        return false
+      })
+      
+      // If editing, exclude the current port from the check
+      if (isEdit) {
+        projectAlreadyHasPort = projectPorts.some(p => p.id !== portId && p.portNumber !== port)
+      } else {
+        projectAlreadyHasPort = projectPorts.length > 0
+      }
+    }
+    
+    // CRITICAL: Use authoritative API to check if port is reserved OR active
+    const availability = await store.checkPortAvailability(port)
+    
+    // Port is unavailable if:
+    // 1. Reserved in database (allocated to another project)
+    // 2. Active at runtime (currently in use)
+    // 3. Project already has this server type allocated
+    const unavailable = availability.isReserved || availability.isActive || projectAlreadyHasPort
+    
+    if (unavailable) {
+      let reason = ''
+      if (projectAlreadyHasPort) {
+        reason = 'Project already has this server type'
+      } else if (availability.isReserved) {
+        reason = `Reserved by ${availability.reservedBy?.name || 'unknown'}`
+      } else if (availability.isActive) {
+        reason = `Active (PID: ${availability.activePid || 'unknown'})`
+      } else {
+        reason = 'Unavailable'
+      }
+      
       return {
         port,
         available: false,
-        reason: isAllocated ? 'Allocated' : 'In Use'
+        reason
       }
     }
     
@@ -253,10 +310,12 @@ function updatePortOptions() {
       available: true,
       reason: ''
     }
-  })
+  }))
 }
 
 watch(() => form.value.portNumber, updatePortOptions)
+watch(() => form.value.name, updatePortOptions)
+watch(() => form.value.serverType, updatePortOptions)
 
 onMounted(async () => {
   await store.fetchPorts()
@@ -289,6 +348,22 @@ async function handleSubmit() {
     return
   }
   
+  // CRITICAL: Final validation - check port availability one more time before submission
+  // This ensures we have the absolute latest state (prevents race conditions)
+  const availability = await store.checkPortAvailability(form.value.portNumber)
+  if (availability.isReserved) {
+    error.value = `Port ${form.value.portNumber} is already reserved by ${availability.reservedBy?.name || 'another project'}. Please refresh and try again.`
+    // Refresh ports to update UI
+    await store.fetchPorts()
+    return
+  }
+  if (availability.isActive) {
+    error.value = `Port ${form.value.portNumber} is currently active (PID: ${availability.activePid || 'unknown'}). Cannot allocate active port.`
+    // Refresh ports to update UI
+    await store.fetchPorts()
+    return
+  }
+  
   try {
     if (isEdit) {
       const updateData: UpdatePortInput = {
@@ -308,6 +383,8 @@ async function handleSubmit() {
     router.push('/admin/ports')
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to save port'
+    // Refresh ports on error to show current state
+    await store.fetchPorts()
   }
 }
 </script>
