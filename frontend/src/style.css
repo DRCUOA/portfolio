@@ -464,6 +464,107 @@ a:hover {
   color: #f1f5f9;
 }
 
+/* Glassmorphism form inputs */
+.glass-input,
+input[type="text"],
+input[type="number"],
+input[type="url"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.dark .glass-input,
+.dark input[type="text"],
+.dark input[type="number"],
+.dark input[type="url"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark textarea,
+.dark select {
+  background: rgba(35, 35, 40, 0.4);
+  border: 1px solid rgba(160, 160, 170, 0.15);
+  color: #e2e8f0;
+}
+
+.glass-input:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="url"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-input:focus,
+.dark input[type="text"]:focus,
+.dark input[type="number"]:focus,
+.dark input[type="url"]:focus,
+.dark input[type="email"]:focus,
+.dark input[type="password"]:focus,
+.dark textarea:focus,
+.dark select:focus {
+  background: rgba(40, 40, 45, 0.5);
+  border-color: rgba(170, 170, 180, 0.25);
+  box-shadow: 0 0 0 3px rgba(100, 150, 255, 0.2);
+}
+
+.glass-input::placeholder,
+input[type="text"]::placeholder,
+input[type="number"]::placeholder,
+input[type="url"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dark .glass-input::placeholder,
+.dark input[type="text"]::placeholder,
+.dark input[type="number"]::placeholder,
+.dark input[type="url"]::placeholder,
+.dark input[type="email"]::placeholder,
+.dark input[type="password"]::placeholder,
+.dark textarea::placeholder {
+  color: rgba(226, 232, 240, 0.5);
+}
+
+.glass-input:disabled,
+input[type="text"]:disabled,
+input[type="number"]:disabled,
+input[type="url"]:disabled,
+input[type="email"]:disabled,
+input[type="password"]:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark .glass-input:disabled,
+.dark input[type="text"]:disabled,
+.dark input[type="number"]:disabled,
+.dark input[type="url"]:disabled,
+.dark input[type="email"]:disabled,
+.dark input[type="password"]:disabled,
+.dark textarea:disabled,
+.dark select:disabled {
+  background: rgba(25, 25, 30, 0.3);
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 10px;
@@ -493,4 +594,31 @@ a:hover {
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(180, 180, 200, 0.6);
+}
+
+/* Thin scrollbar for card content */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 170, 0.3);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(180, 180, 200, 0.4);
 }

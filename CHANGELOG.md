@@ -1,3 +1,67 @@
+## [1.1.8] - 2025-12-01
+
+### Added
+- Port availability checking API endpoint (`GET /api/ports/check/:portNumber`) that checks both database allocation and runtime status
+- `checkPortAvailability` function in portfolio store for frontend port availability checks
+- Real-time port availability validation in PortForm using authoritative API
+- Enhanced port conflict detection preventing duplicate allocations per project-server type combination
+
+### Changed
+- Port creation and update validation now checks both database allocation (reserved) and runtime status (active)
+- Port form availability checking now uses authoritative API endpoint instead of local state
+- Port form refreshes port list from server before checking availability to prevent stale data
+- Port form validates availability on port number, project ID, and server type changes
+- Port form performs final availability check before submission to prevent race conditions
+- ProjectList port matching enhanced to support both new format (direct project ID) and legacy format (project-slug with server type suffix)
+- Server binding changed to localhost (127.0.0.1) for security, preventing listening on all interfaces
+- Port checker utility binds to localhost (127.0.0.1) for security
+
+### Fixed
+- Port allocation conflicts now properly detected for both new and legacy port name formats
+- Port availability checking now accounts for both reserved (DB) and active (runtime) states
+- Improved error messages showing which project reserved a port or which PID is using it
+
+### Technical Details
+- Port availability endpoint returns: available status, isReserved flag, isActive flag, reservedBy info, activePid
+- Port validation checks three conditions: reserved in DB, active at runtime, or already allocated to same project-server type
+- Legacy port format support: "project-slug Backend" or "project-slug Frontend" patterns
+- Server security: Explicit HOST binding prevents accidental exposure on all network interfaces
+- Files updated: PortController.ts, portRoutes.ts, portChecker.ts, server.ts, portfolio.ts, PortForm.vue, ProjectList.vue
+
+---
+
+## [1.1.7] - 2025-11-30
+
+### Added
+- Glassmorphism input utilities in style.css for consistent form styling across admin views
+- Project detail modal in ProjectList view with full project information display
+- Assigned ports section in project detail modal showing all ports linked to each project
+- Card-based layout for ProjectList view replacing table layout
+- Scrollable modal content with fixed header and footer sections
+- Empty state for ports section with greyed-out port icon when no ports assigned
+
+### Changed
+- Standardized all admin views (forms and lists) to use glassmorphism styling from style.css
+- Replaced bg-gray-50 dark:bg-slate-900 backgrounds with glass card effects
+- Applied .glass-card classes to all form containers and table wrappers
+- Converted all form inputs to use glassmorphism styling with .glass-input class
+- Applied .btn-glass to all buttons across admin views
+- Transformed standard HTML tables into glassmorphism cards with glass backgrounds
+- Added consistent hover effects and animations across all admin views
+- ProjectList view converted from table to responsive card grid (1/2/3 columns)
+- Port form layout aligned to match Server Type and Project ID grid structure
+- Modal overflow scrolling enabled for long content
+
+### Technical Details
+- Added glass-input utility classes to style.css for inputs, textareas, and selects
+- All admin forms now use consistent glassmorphism styling matching dashboard cards
+- ProjectList cards have fixed height (400px) with scrollable body section
+- Modal uses max-h-[calc(90vh-200px)] for scrollable content area
+- Port number and nearby ports selector aligned using grid-cols-1 sm:grid-cols-2 layout
+- Port numbers use font-mono for consistent alignment
+- Files updated: style.css, PartitionForm.vue, PartitionList.vue, PortForm.vue, PortList.vue, ProjectForm.vue, ProjectList.vue, TrafficAnalytics.vue
+
+---
 ## [1.1.6] - 2025-11-30
 
 ### Changed

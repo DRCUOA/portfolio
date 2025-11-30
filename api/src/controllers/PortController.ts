@@ -4,6 +4,44 @@ import { ProjectModel } from '../models/Project';
 import { getPortStatus } from '../utils/portChecker';
 
 export class PortController {
+  // GET /api/ports/check/:portNumber - Check if port is available (not reserved and not active)
+  static async checkAvailability(req: Request, res: Response): Promise<void> {
+    try {
+      const portNumber = parseInt(req.params.portNumber, 10);
+      
+      if (isNaN(portNumber) || portNumber < 1 || portNumber > 65535) {
+        res.status(400).json({ error: 'Invalid port number' });
+        return;
+      }
+
+      // Check if port is reserved (allocated in database)
+      const allocatedPort = PortModel.findByPortNumber(portNumber);
+      const isReserved = !!allocatedPort;
+
+      // Check if port is active (in use at runtime)
+      const runtimeStatus = await getPortStatus(portNumber);
+      const isActive = runtimeStatus.inUse;
+
+      const available = !isReserved && !isActive;
+
+      res.json({
+        portNumber,
+        available,
+        isReserved,
+        isActive,
+        reservedBy: allocatedPort ? {
+          id: allocatedPort.id,
+          name: allocatedPort.name,
+          serverType: allocatedPort.serverType
+        } : null,
+        activePid: runtimeStatus.pid || null
+      });
+    } catch (error) {
+      console.error('Error checking port availability:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+
   // GET /api/ports
   static async getAll(req: Request, res: Response): Promise<void> {
     try {
@@ -108,9 +146,21 @@ export class PortController {
         return;
       }
 
-      // Check if port number already exists
-      if (PortModel.findByPortNumber(data.portNumber)) {
-        res.status(409).json({ error: 'Port number already in use' });
+      // CRITICAL: Check if port is already allocated (reserved) in database
+      const existingAllocatedPort = PortModel.findByPortNumber(data.portNumber);
+      if (existingAllocatedPort) {
+        res.status(409).json({ 
+          error: `Port ${data.portNumber} is already allocated to ${existingAllocatedPort.name || 'unknown project'}. Cannot allocate reserved port.` 
+        });
+        return;
+      }
+
+      // CRITICAL: Check if port is actively in use at runtime (even if not in DB)
+      const runtimeStatus = await getPortStatus(data.portNumber);
+      if (runtimeStatus.inUse) {
+        res.status(409).json({ 
+          error: `Port ${data.portNumber} is currently active (PID: ${runtimeStatus.pid || 'unknown'}). Cannot allocate active port.` 
+        });
         return;
       }
 
@@ -119,6 +169,41 @@ export class PortController {
         const project = ProjectModel.findById(data.name.trim());
         if (!project) {
           res.status(400).json({ error: `NAME must be an existing project ID. Project with ID "${data.name}" not found.` });
+          return;
+        }
+        
+        // Check if a port is already allocated to this project for the same server type
+        const existingPorts = PortModel.findAll();
+        const projectId = data.name.trim();
+        const conflictingPort = existingPorts.find(port => {
+          if (!port.name) return false;
+          
+          // New format: direct match
+          if (port.name === projectId && port.serverType === data.serverType) {
+            return true;
+          }
+          
+          // Legacy format: "project-slug Backend" or "project-slug Frontend"
+          const parts = port.name.split(' ');
+          if (parts.length >= 2) {
+            const projectIdentifier = parts.slice(0, -1).join(' ');
+            const serverTypeInName = parts[parts.length - 1].toLowerCase();
+            const expectedServerType = data.serverType === 'api' ? 'backend' : data.serverType;
+            
+            if ((projectIdentifier === projectId || projectIdentifier === project.slug) && 
+                serverTypeInName === expectedServerType && 
+                port.serverType === data.serverType) {
+              return true;
+            }
+          }
+          
+          return false;
+        });
+        
+        if (conflictingPort) {
+          res.status(409).json({ 
+            error: `Port already allocated to project "${project.name}" (${projectId}) for server type "${data.serverType}". Existing port: ${conflictingPort.portNumber} (${conflictingPort.id})` 
+          });
           return;
         }
       }
@@ -162,11 +247,26 @@ export class PortController {
           res.status(400).json({ error: 'Port number must be between 1 and 65535' });
           return;
         }
-        // Check if port number is already used by another port
-        const existingPort = PortModel.findByPortNumber(data.portNumber);
-        if (existingPort && existingPort.id !== id) {
-          res.status(409).json({ error: 'Port number already in use' });
+        
+        // CRITICAL: Check if port number is already allocated (reserved) by another port
+        const existingAllocatedPort = PortModel.findByPortNumber(data.portNumber);
+        if (existingAllocatedPort && existingAllocatedPort.id !== id) {
+          res.status(409).json({ 
+            error: `Port ${data.portNumber} is already allocated to ${existingAllocatedPort.name || 'unknown project'}. Cannot allocate reserved port.` 
+          });
           return;
+        }
+        
+        // CRITICAL: Check if port is actively in use at runtime (even if not in DB)
+        // Only check if changing to a different port number
+        if (data.portNumber !== port.portNumber) {
+          const runtimeStatus = await getPortStatus(data.portNumber);
+          if (runtimeStatus.inUse) {
+            res.status(409).json({ 
+              error: `Port ${data.portNumber} is currently active (PID: ${runtimeStatus.pid || 'unknown'}). Cannot allocate active port.` 
+            });
+            return;
+          }
         }
       }
 
@@ -176,6 +276,44 @@ export class PortController {
           const project = ProjectModel.findById(data.name.trim());
           if (!project) {
             res.status(400).json({ error: `NAME must be an existing project ID. Project with ID "${data.name}" not found.` });
+            return;
+          }
+          
+          // Check if a port is already allocated to this project for the same server type
+          // (excluding the current port being updated)
+          const existingPorts = PortModel.findAll();
+          const projectId = data.name.trim();
+          const serverType = data.serverType || port.serverType;
+          const conflictingPort = existingPorts.find(p => {
+            if (p.id === id) return false; // Skip the current port
+            if (!p.name) return false;
+            
+            // New format: direct match
+            if (p.name === projectId && p.serverType === serverType) {
+              return true;
+            }
+            
+            // Legacy format: "project-slug Backend" or "project-slug Frontend"
+            const parts = p.name.split(' ');
+            if (parts.length >= 2) {
+              const projectIdentifier = parts.slice(0, -1).join(' ');
+              const serverTypeInName = parts[parts.length - 1].toLowerCase();
+              const expectedServerType = serverType === 'api' ? 'backend' : serverType;
+              
+              if ((projectIdentifier === projectId || projectIdentifier === project.slug) && 
+                  serverTypeInName === expectedServerType && 
+                  p.serverType === serverType) {
+                return true;
+              }
+            }
+            
+            return false;
+          });
+          
+          if (conflictingPort) {
+            res.status(409).json({ 
+              error: `Port already allocated to project "${project.name}" (${projectId}) for server type "${serverType}". Existing port: ${conflictingPort.portNumber} (${conflictingPort.id})` 
+            });
             return;
           }
         }

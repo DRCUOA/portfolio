@@ -13,7 +13,8 @@ export function isPortInUse(port: number): Promise<boolean> {
   return new Promise((resolve) => {
     const server = net.createServer();
     
-    server.listen(port, () => {
+    // Explicitly bind to localhost (127.0.0.1) for security
+    server.listen(port, '127.0.0.1', () => {
       server.once('close', () => {
         resolve(false);
       });
