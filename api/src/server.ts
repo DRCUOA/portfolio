@@ -16,7 +16,7 @@ import { trafficTrackingMiddleware } from './utils/trafficLogger';
 import { printFooter } from './utils/footer';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // Parse CORS origins from environment variable
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -50,8 +50,9 @@ app.use('/api/traffic', trafficRoutes);
 getDb();
 
 // Start server and store the server instance
-// Explicitly bind to localhost (127.0.0.1) for security - prevents listening on all interfaces
-const HOST = process.env.HOST || '127.0.0.1';
+// CRITICAL SECURITY: Always bind to localhost (127.0.0.1) to prevent exposure to external networks
+// Ignore HOST environment variable for security - only allow localhost binding
+const HOST = '127.0.0.1';
 const server = app.listen(PORT, HOST, () => {
   // Determine frontend status for footer
   const frontendStatus = process.env.DEV_FULL === 'true' ? 'active' : 'INACTIVE';
