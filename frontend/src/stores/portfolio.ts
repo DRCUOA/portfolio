@@ -476,6 +476,30 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     }
   }
 
+  async function unallocatePort(id: string) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await fetch(`${API_BASE_URL}/ports/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: null }),
+      })
+      if (!response.ok) {
+        const err = await response.json()
+        throw new Error(err.error || 'Failed to unallocate port')
+      }
+      const result = await response.json()
+      await fetchPorts()
+      return result
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Unknown error'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   // Check port availability (checks both DB allocation and runtime status)
   async function checkPortAvailability(portNumber: number): Promise<{
     available: boolean
@@ -573,6 +597,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     createPort,
     updatePort,
     deletePort,
+    unallocatePort,
     checkPortAvailability,
     logClick,
     fetchTrafficStats,

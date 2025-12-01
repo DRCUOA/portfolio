@@ -176,6 +176,13 @@
                         Edit
                       </router-link>
                       <button
+                        @click="handleUnallocate(project.frontend.id)"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-yellow-200 dark:text-yellow-300 hover:text-yellow-100 dark:hover:text-yellow-200 transition-all"
+                        :disabled="unallocating === project.frontend.id"
+                      >
+                        {{ unallocating === project.frontend.id ? 'Unallocating...' : 'Unallocate' }}
+                      </button>
+                      <button
                         @click="handleDelete(project.frontend.id)"
                         class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-red-200 dark:text-red-300 hover:text-red-100 dark:hover:text-red-200 transition-all"
                         :disabled="deleting === project.frontend.id"
@@ -210,6 +217,13 @@
                       >
                         Edit
                       </router-link>
+                      <button
+                        @click="handleUnallocate(project.backend.id)"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-yellow-200 dark:text-yellow-300 hover:text-yellow-100 dark:hover:text-yellow-200 transition-all"
+                        :disabled="unallocating === project.backend.id"
+                      >
+                        {{ unallocating === project.backend.id ? 'Unallocating...' : 'Unallocate' }}
+                      </button>
                       <button
                         @click="handleDelete(project.backend.id)"
                         class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-red-200 dark:text-red-300 hover:text-red-100 dark:hover:text-red-200 transition-all"
@@ -275,6 +289,14 @@
                       >
                         Edit
                       </router-link>
+                      <button
+                        v-if="port.name"
+                        @click="handleUnallocate(port.id)"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-yellow-200 dark:text-yellow-300 hover:text-yellow-100 dark:hover:text-yellow-200 mr-2 transition-all"
+                        :disabled="unallocating === port.id"
+                      >
+                        {{ unallocating === port.id ? 'Unallocating...' : 'Unallocate' }}
+                      </button>
                       <button
                         @click="handleDelete(port.id)"
                         class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-red-200 dark:text-red-300 hover:text-red-100 dark:hover:text-red-200 transition-all"
@@ -344,6 +366,14 @@
                         Edit
                       </router-link>
                       <button
+                        v-if="port.name"
+                        @click="handleUnallocate(port.id)"
+                        class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-yellow-200 dark:text-yellow-300 hover:text-yellow-100 dark:hover:text-yellow-200 mr-2 transition-all"
+                        :disabled="unallocating === port.id"
+                      >
+                        {{ unallocating === port.id ? 'Unallocating...' : 'Unallocate' }}
+                      </button>
+                      <button
                         @click="handleDelete(port.id)"
                         class="btn-glass px-3 py-1.5 rounded-lg text-xs font-semibold text-red-200 dark:text-red-300 hover:text-red-100 dark:hover:text-red-200 transition-all"
                         :disabled="deleting === port.id"
@@ -376,6 +406,7 @@ import { usePortfolioStore, type TrafficStats, type Project } from '../../stores
 const router = useRouter()
 const store = usePortfolioStore()
 const deleting = ref<string | null>(null)
+const unallocating = ref<string | null>(null)
 const viewMode = ref<'by-type' | 'by-project'>('by-type')
 const trafficStats = ref<TrafficStats[]>([])
 const loadingStats = ref(false)
@@ -620,6 +651,21 @@ async function handleDelete(id: string) {
     alert(error instanceof Error ? error.message : 'Failed to delete port')
   } finally {
     deleting.value = null
+  }
+}
+
+async function handleUnallocate(id: string) {
+  if (!confirm('Are you sure you want to unallocate this port from its project? The port will remain but will no longer be assigned to any project.')) {
+    return
+  }
+
+  unallocating.value = id
+  try {
+    await store.unallocatePort(id)
+  } catch (error) {
+    alert(error instanceof Error ? error.message : 'Failed to unallocate port')
+  } finally {
+    unallocating.value = null
   }
 }
 </script>

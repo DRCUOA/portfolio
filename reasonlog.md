@@ -24,6 +24,7 @@ The document content is captured in two different formats, one optimized for hum
 
 | Version | Date | Component | Intent | Reasoning | Problems Solved | Goals Achieved |
 |---------|------|-----------|--------|-----------|-----------------|----------------|
+| 1.1.9 | 01/12/25 | port-unallocation | Add port unallocation functionality to admin panel | Implemented ability to unallocate ports from projects without deleting the port record. This allows administrators to remove project assignments when ports need to be reassigned or freed up, while preserving the port configuration. The unallocation sets the port's name field to null, effectively removing the project association. Added "Unallocate" button that appears conditionally when a port has a project assigned, styled with yellow accent to distinguish from delete action. Includes confirmation dialog to prevent accidental unallocation. The feature works in both table view (by server type) and project-grouped view, maintaining consistency across the admin interface. | No way to remove project assignment from ports without deleting the port; had to manually edit port to clear project association; inefficient workflow for port reassignment | Port unallocation without deletion; conditional button visibility; confirmation dialog for safety; consistent UI across view modes; improved port management workflow |
 | 1.1.8 | 01/12/25 | port-availability-checking | Add authoritative port availability checking API endpoint | Created dedicated API endpoint for checking port availability that combines both database allocation status and runtime port usage. This provides a single source of truth for port availability, preventing race conditions and stale data issues. The endpoint returns comprehensive information including whether port is reserved, active, which project reserved it, and which PID is using it. Frontend now uses this authoritative endpoint instead of relying on local state, ensuring accuracy and preventing allocation conflicts. | No authoritative way to check port availability; frontend relied on potentially stale local state; race conditions when multiple users check ports simultaneously | Authoritative port availability checking; single source of truth for port status; prevention of race conditions; accurate availability information |
 | 1.1.8 | 01/12/25 | port-validation-enhancement | Enhance port validation to check both database allocation and runtime status | Enhanced port creation and update validation to check both whether a port is reserved in the database and whether it's actively in use at runtime. This dual-check approach prevents allocating ports that are either already reserved or currently active, even if not in the database. Validation now provides clear error messages indicating whether a port is reserved by another project or actively in use with PID information. This prevents port conflicts and provides better debugging information. | Port validation only checked database, missing runtime active ports; unclear error messages when ports were unavailable; ports could be allocated even if actively in use | Dual validation (DB + runtime); prevention of port conflicts; clear error messages with context; better debugging information |
 | 1.1.8 | 01/12/25 | port-conflict-detection | Improve port conflict detection for project-server type combinations | Enhanced conflict detection to prevent allocating multiple ports of the same server type to the same project. The validation checks both new format (direct project ID match) and legacy format (project-slug with server type suffix) to ensure compatibility. This prevents accidental duplicate allocations and maintains data integrity. The check is performed both during creation and update operations, with clear error messages indicating which existing port conflicts. | No validation preventing multiple ports of same server type per project; legacy format ports not properly detected; unclear conflict messages | Prevention of duplicate port allocations per project-server type; support for both new and legacy formats; clear conflict error messages; improved data integrity |
@@ -56,6 +57,35 @@ The document content is captured in two different formats, one optimized for hum
   "versioning": "semantic",
   "format": "reasonlog",
   "versions": [
+    {
+      "version": "1.1.9",
+      "date": "01/12/25",
+      "reasons": [
+        {
+          "component": "port-unallocation",
+          "intent": "Add port unallocation functionality to admin panel",
+          "reasoning": "Implemented ability to unallocate ports from projects without deleting the port record. This allows administrators to remove project assignments when ports need to be reassigned or freed up, while preserving the port configuration. The unallocation sets the port's name field to null, effectively removing the project association. Added \"Unallocate\" button that appears conditionally when a port has a project assigned, styled with yellow accent to distinguish from delete action. Includes confirmation dialog to prevent accidental unallocation. The feature works in both table view (by server type) and project-grouped view, maintaining consistency across the admin interface.",
+          "problemsSolved": [
+            "No way to remove project assignment from ports without deleting the port",
+            "Had to manually edit port to clear project association",
+            "Inefficient workflow for port reassignment"
+          ],
+          "goalsAchieved": [
+            "Port unallocation without deletion",
+            "Conditional button visibility",
+            "Confirmation dialog for safety",
+            "Consistent UI across view modes",
+            "Improved port management workflow"
+          ],
+          "files": [
+            "frontend/src/stores/portfolio.ts",
+            "frontend/src/views/admin/PortList.vue"
+          ],
+          "alternativesConsidered": [],
+          "dependencies": []
+        }
+      ]
+    },
     {
       "version": "1.1.8",
       "date": "01/12/25",

@@ -1,3 +1,23 @@
+## [1.1.9] - 2025-12-01
+
+### Added
+- Port unallocation functionality in admin panel to remove project assignment from ports
+- "Unallocate" button in PortList view that appears when a port has a project assigned
+- `unallocatePort` function in portfolio store for unallocating ports from projects
+
+### Changed
+- PortList view now displays "Unallocate" button alongside Edit and Delete buttons for allocated ports
+- Unallocate button styled with yellow accent color to distinguish from delete action
+
+### Technical Details
+- Unallocation sets port `name` field to `null`, removing project assignment while preserving port record
+- Unallocate button only visible when `port.name` is not null/empty
+- Confirmation dialog prompts user before unallocating port
+- Port list automatically refreshes after unallocation to reflect updated state
+- Files updated: portfolio.ts, PortList.vue
+
+---
+
 ## [1.1.8] - 2025-12-01
 
 ### Added
