@@ -68,7 +68,7 @@
                 class="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass overflow-hidden shadow-2xl transition-colors"
               >
                 <img
-                  src="/e-artem-icon.png"
+                  src="/favicon.svg"
                   :alt="`${project.name} logo`"
                   class="w-full h-full object-cover"
                 />
@@ -78,7 +78,7 @@
                 class="w-32 h-32 md:w-40 md:h-40 rounded-3xl glass overflow-hidden shadow-2xl transition-colors"
               >
                 <img
-                  src="/simples-icon.png"
+                  src="/favicon.svg"
                   :alt="`${project.name} logo`"
                   class="w-full h-full object-cover"
                 />
@@ -525,7 +525,12 @@ function formatDate(dateString: string): string {
 
 function handleImageError(event: Event) {
   const img = event.target as HTMLImageElement
-  img.style.display = 'none'
+  // Fallback to favicon if image fails to load
+  if (img.src !== '/favicon.svg') {
+    img.src = '/favicon.svg'
+  } else {
+    img.style.display = 'none'
+  }
 }
 
 function getLogoUrl(path: string): string {
@@ -535,8 +540,12 @@ function getLogoUrl(path: string): string {
 
 function handleLogoError(event: Event) {
   const img = event.target as HTMLImageElement
-  // If logo fails to load, hide it and fall back to letter
-  img.style.display = 'none'
+  // Fallback to favicon if logo fails to load
+  if (img.src !== '/favicon.svg') {
+    img.src = '/favicon.svg'
+  } else {
+    img.style.display = 'none'
+  }
 }
 
 function openScreenshotModal(screenshot: string, index: number) {

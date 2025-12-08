@@ -918,7 +918,12 @@ function saveLabel() {
 // Handle image load errors
 function handleImageError(event: Event) {
   const img = event.target as HTMLImageElement
-  img.style.display = 'none'
+  // Fallback to favicon if image fails to load
+  if (img.src !== '/favicon.svg') {
+    img.src = '/favicon.svg'
+  } else {
+    img.style.display = 'none'
+  }
 }
 
 // Helper to normalize screenshot paths - ensure we store relative paths, not full URLs

@@ -82,22 +82,22 @@ const getPartitionLogo = (partition: any): string | null => {
   
   // Mental Health
   if (name.includes('mental health') || name.includes('peer support') || slug.includes('mental-health') || slug.includes('peer-support')) {
-    return '/mental-health.png'
+    return '/favicon.svg'
   }
   
   // Finances
   if (name.includes('finance') || slug.includes('finance')) {
-    return '/finance.png'
+    return '/favicon.svg'
   }
   
   // Creative
   if (name.includes('creative') || slug.includes('creative')) {
-    return '/creative.png'
+    return '/favicon.svg'
   }
   
   // Research & Development
   if (name.includes('research') || name.includes('r&d') || name.includes('experiments') || slug.includes('research') || slug.includes('experiments')) {
-    return '/researchdev.png'
+    return '/favicon.svg'
   }
   
   return null

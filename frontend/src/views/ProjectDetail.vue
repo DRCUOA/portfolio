@@ -66,7 +66,7 @@
               class="w-24 h-24 rounded-3xl glass flex items-center justify-center overflow-hidden transition-colors"
             >
               <img
-                src="/e-artem-icon.png"
+                src="/favicon.svg"
                 :alt="`${project.name} logo`"
                 class="w-full h-full object-cover"
               />
@@ -76,7 +76,7 @@
               class="w-24 h-24 rounded-3xl glass flex items-center justify-center overflow-hidden transition-colors"
             >
               <img
-                src="/simples-icon.png"
+                src="/favicon.svg"
                 :alt="`${project.name} logo`"
                 class="w-full h-full object-cover"
               />

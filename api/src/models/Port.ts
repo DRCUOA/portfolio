@@ -1,4 +1,5 @@
 import { getDb } from '../db';
+import { TrafficLogModel } from './TrafficLog';
 
 export type ServerType = 'frontend' | 'backend' | 'api';
 
@@ -121,6 +122,11 @@ export class PortModel {
 
   static delete(id: string): boolean {
     const db = getDb();
+    
+    // First, delete all related traffic logs to avoid foreign key constraint errors
+    TrafficLogModel.deleteByPortId(id);
+    
+    // Then delete the port
     const result = db.prepare('DELETE FROM ports WHERE id = ?').run(id);
     return result.changes > 0;
   }

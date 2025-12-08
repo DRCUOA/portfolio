@@ -248,18 +248,18 @@ export class PortController {
           return;
         }
         
-        // CRITICAL: Check if port number is already allocated (reserved) by another port
-        const existingAllocatedPort = PortModel.findByPortNumber(data.portNumber);
-        if (existingAllocatedPort && existingAllocatedPort.id !== id) {
-          res.status(409).json({ 
-            error: `Port ${data.portNumber} is already allocated to ${existingAllocatedPort.name || 'unknown project'}. Cannot allocate reserved port.` 
-          });
-          return;
-        }
-        
-        // CRITICAL: Check if port is actively in use at runtime (even if not in DB)
-        // Only check if changing to a different port number
+        // Only check for conflicts if the port number is actually changing
         if (data.portNumber !== port.portNumber) {
+          // CRITICAL: Check if port number is already allocated (reserved) by another port
+          const existingAllocatedPort = PortModel.findByPortNumber(data.portNumber);
+          if (existingAllocatedPort && existingAllocatedPort.id !== id) {
+            res.status(409).json({ 
+              error: `Port ${data.portNumber} is already allocated to ${existingAllocatedPort.name || 'unknown project'}. Cannot allocate reserved port.` 
+            });
+            return;
+          }
+          
+          // CRITICAL: Check if port is actively in use at runtime (even if not in DB)
           const runtimeStatus = await getPortStatus(data.portNumber);
           if (runtimeStatus.inUse) {
             res.status(409).json({ 
@@ -268,6 +268,7 @@ export class PortController {
             return;
           }
         }
+        // If port number is not changing, skip all conflict checks - allow the update
       }
 
       // Validate that name (if provided) must be an existing project ID
@@ -279,43 +280,50 @@ export class PortController {
             return;
           }
           
-          // Check if a port is already allocated to this project for the same server type
-          // (excluding the current port being updated)
-          const existingPorts = PortModel.findAll();
-          const projectId = data.name.trim();
-          const serverType = data.serverType || port.serverType;
-          const conflictingPort = existingPorts.find(p => {
-            if (p.id === id) return false; // Skip the current port
-            if (!p.name) return false;
-            
-            // New format: direct match
-            if (p.name === projectId && p.serverType === serverType) {
-              return true;
-            }
-            
-            // Legacy format: "project-slug Backend" or "project-slug Frontend"
-            const parts = p.name.split(' ');
-            if (parts.length >= 2) {
-              const projectIdentifier = parts.slice(0, -1).join(' ');
-              const serverTypeInName = parts[parts.length - 1].toLowerCase();
-              const expectedServerType = serverType === 'api' ? 'backend' : serverType;
+          // Only check for conflicts if name or serverType is actually changing
+          const nameChanged = data.name.trim() !== (port.name || '');
+          const serverTypeChanged = data.serverType !== undefined && data.serverType !== port.serverType;
+          
+          if (nameChanged || serverTypeChanged) {
+            // Check if a port is already allocated to this project for the same server type
+            // (excluding the current port being updated)
+            const existingPorts = PortModel.findAll();
+            const projectId = data.name.trim();
+            const serverType = data.serverType || port.serverType;
+            const conflictingPort = existingPorts.find(p => {
+              if (p.id === id) return false; // Skip the current port
+              if (!p.name) return false;
               
-              if ((projectIdentifier === projectId || projectIdentifier === project.slug) && 
-                  serverTypeInName === expectedServerType && 
-                  p.serverType === serverType) {
+              // New format: direct match
+              if (p.name === projectId && p.serverType === serverType) {
                 return true;
               }
-            }
-            
-            return false;
-          });
-          
-          if (conflictingPort) {
-            res.status(409).json({ 
-              error: `Port already allocated to project "${project.name}" (${projectId}) for server type "${serverType}". Existing port: ${conflictingPort.portNumber} (${conflictingPort.id})` 
+              
+              // Legacy format: "project-slug Backend" or "project-slug Frontend"
+              const parts = p.name.split(' ');
+              if (parts.length >= 2) {
+                const projectIdentifier = parts.slice(0, -1).join(' ');
+                const serverTypeInName = parts[parts.length - 1].toLowerCase();
+                const expectedServerType = serverType === 'api' ? 'backend' : serverType;
+                
+                if ((projectIdentifier === projectId || projectIdentifier === project.slug) && 
+                    serverTypeInName === expectedServerType && 
+                    p.serverType === serverType) {
+                  return true;
+                }
+              }
+              
+              return false;
             });
-            return;
+            
+            if (conflictingPort) {
+              res.status(409).json({ 
+                error: `Port already allocated to project "${project.name}" (${projectId}) for server type "${serverType}". Existing port: ${conflictingPort.portNumber} (${conflictingPort.id})` 
+              });
+              return;
+            }
           }
+          // If name and serverType are not changing, skip conflict check - allow the update
         }
       }
 
