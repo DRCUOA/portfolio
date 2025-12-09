@@ -65,7 +65,7 @@
                     class="w-12 h-12 rounded-2xl glass-strong flex items-center justify-center overflow-hidden transition-colors"
                   >
                     <img
-                      src="/favicon.svg"
+                      src="/simples-icon.png"
                       :alt="`${project.name} logo`"
                       class="w-full h-full object-cover"
                     />

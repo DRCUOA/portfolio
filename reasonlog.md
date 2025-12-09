@@ -24,6 +24,7 @@ The document content is captured in two different formats, one optimized for hum
 
 | Version | Date | Component | Intent | Reasoning | Problems Solved | Goals Achieved |
 |---------|------|-----------|--------|-----------|-----------------|----------------|
+| 1.1.10 | 01/12/25 | partition-logo-restoration | Restore original partition logo images for better visual identity | Restored partition logo images that were previously replaced with favicon.svg fallback. The original logo images (mental-health.png, finance.png, creative.png, researchdev.png) provide better visual branding and recognition for each partition category. Also restored simples-icon.png for project display in PartitionDetail view. This restores the intended visual design while maintaining the existing logo mapping logic. | Partition logos were replaced with generic favicon.svg, reducing visual identity and branding; project icons also replaced with generic fallback | Restored original partition logo images; improved visual branding and recognition; maintained existing logo mapping functionality |
 | 1.1.9 | 01/12/25 | port-unallocation | Add port unallocation functionality to admin panel | Implemented ability to unallocate ports from projects without deleting the port record. This allows administrators to remove project assignments when ports need to be reassigned or freed up, while preserving the port configuration. The unallocation sets the port's name field to null, effectively removing the project association. Added "Unallocate" button that appears conditionally when a port has a project assigned, styled with yellow accent to distinguish from delete action. Includes confirmation dialog to prevent accidental unallocation. The feature works in both table view (by server type) and project-grouped view, maintaining consistency across the admin interface. | No way to remove project assignment from ports without deleting the port; had to manually edit port to clear project association; inefficient workflow for port reassignment | Port unallocation without deletion; conditional button visibility; confirmation dialog for safety; consistent UI across view modes; improved port management workflow |
 | 1.1.8 | 01/12/25 | port-availability-checking | Add authoritative port availability checking API endpoint | Created dedicated API endpoint for checking port availability that combines both database allocation status and runtime port usage. This provides a single source of truth for port availability, preventing race conditions and stale data issues. The endpoint returns comprehensive information including whether port is reserved, active, which project reserved it, and which PID is using it. Frontend now uses this authoritative endpoint instead of relying on local state, ensuring accuracy and preventing allocation conflicts. | No authoritative way to check port availability; frontend relied on potentially stale local state; race conditions when multiple users check ports simultaneously | Authoritative port availability checking; single source of truth for port status; prevention of race conditions; accurate availability information |
 | 1.1.8 | 01/12/25 | port-validation-enhancement | Enhance port validation to check both database allocation and runtime status | Enhanced port creation and update validation to check both whether a port is reserved in the database and whether it's actively in use at runtime. This dual-check approach prevents allocating ports that are either already reserved or currently active, even if not in the database. Validation now provides clear error messages indicating whether a port is reserved by another project or actively in use with PID information. This prevents port conflicts and provides better debugging information. | Port validation only checked database, missing runtime active ports; unclear error messages when ports were unavailable; ports could be allocated even if actively in use | Dual validation (DB + runtime); prevention of port conflicts; clear error messages with context; better debugging information |
@@ -57,6 +58,32 @@ The document content is captured in two different formats, one optimized for hum
   "versioning": "semantic",
   "format": "reasonlog",
   "versions": [
+    {
+      "version": "1.1.10",
+      "date": "01/12/25",
+      "reasons": [
+        {
+          "component": "partition-logo-restoration",
+          "intent": "Restore original partition logo images for better visual identity",
+          "reasoning": "Restored partition logo images that were previously replaced with favicon.svg fallback. The original logo images (mental-health.png, finance.png, creative.png, researchdev.png) provide better visual branding and recognition for each partition category. Also restored simples-icon.png for project display in PartitionDetail view. This restores the intended visual design while maintaining the existing logo mapping logic.",
+          "problemsSolved": [
+            "Partition logos were replaced with generic favicon.svg, reducing visual identity and branding",
+            "Project icons also replaced with generic fallback"
+          ],
+          "goalsAchieved": [
+            "Restored original partition logo images",
+            "Improved visual branding and recognition",
+            "Maintained existing logo mapping functionality"
+          ],
+          "files": [
+            "frontend/src/views/PartitionList.vue",
+            "frontend/src/views/PartitionDetail.vue"
+          ],
+          "alternativesConsidered": [],
+          "dependencies": []
+        }
+      ]
+    },
     {
       "version": "1.1.9",
       "date": "01/12/25",

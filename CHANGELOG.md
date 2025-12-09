@@ -1,3 +1,15 @@
+## [1.1.10] - 2025-12-01
+
+### Changed
+- Restored partition logo images in PartitionList view (mental-health.png, finance.png, creative.png, researchdev.png)
+- Restored project icon image in PartitionDetail view (simples-icon.png)
+
+### Technical Details
+- Replaced favicon.svg fallback with original partition logo images for better visual identity
+- Files updated: PartitionList.vue, PartitionDetail.vue
+
+---
+
 ## [1.1.9] - 2025-12-01
 
 ### Added
