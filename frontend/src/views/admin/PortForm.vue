@@ -31,7 +31,6 @@
               max="65535"
               class="w-full px-4 py-3 text-sm sm:text-base rounded-xl glass-input transition-colors font-mono"
               placeholder="e.g., 5173"
-              @input="updatePortOptions"
             />
             <p class="mt-1 text-xs sm:text-sm text-white/70 dark:text-slate-400 transition-colors">Port number between 1 and 65535</p>
           </div>
@@ -45,7 +44,7 @@
                 class="w-full px-4 py-3 text-sm sm:text-base rounded-xl glass-input cursor-pointer transition-colors"
                 @click="showDropdown = !showDropdown"
                 tabindex="0"
-                @blur="setTimeout(() => showDropdown = false, 200)"
+                @blur="handleDropdownBlur"
               >
                 <div class="flex items-center justify-between">
                   <span class="text-white dark:text-slate-100 truncate font-mono">{{ form.portNumber }}</span>
@@ -196,6 +195,7 @@ interface PortOption {
 }
 
 const portOptions = ref<PortOption[]>([])
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 const availableProjects = computed(() => {
   return projects.value.sort((a, b) => a.name.localeCompare(b.name))
@@ -220,7 +220,14 @@ function selectPort(port: number) {
   updatePortOptions()
 }
 
+function handleDropdownBlur() {
+  setTimeout(() => {
+    showDropdown.value = false
+  }, 200)
+}
+
 async function updatePortOptions() {
+  // Only clear options if port number is invalid - preserve previous options while loading
   if (!form.value.portNumber || form.value.portNumber < 1 || form.value.portNumber > 65535) {
     portOptions.value = []
     return
@@ -239,6 +246,7 @@ async function updatePortOptions() {
   ].filter(p => p >= 1 && p <= 65535)
 
   // Check availability for each port using authoritative API
+  // Note: Previous options remain visible until new ones load, preventing flash
   portOptions.value = await Promise.all(ports.map(async (port) => {
     // Check if this project already has a port allocated for this server type
     const projectId = form.value.name
@@ -313,9 +321,27 @@ async function updatePortOptions() {
   }))
 }
 
-watch(() => form.value.portNumber, updatePortOptions)
-watch(() => form.value.name, updatePortOptions)
-watch(() => form.value.serverType, updatePortOptions)
+// Debounced watchers to prevent excessive API calls and focus loss
+watch(() => form.value.portNumber, () => {
+  if (debounceTimer) clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    updatePortOptions()
+  }, 400)
+})
+
+watch(() => form.value.name, () => {
+  if (debounceTimer) clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    updatePortOptions()
+  }, 400)
+})
+
+watch(() => form.value.serverType, () => {
+  if (debounceTimer) clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    updatePortOptions()
+  }, 400)
+})
 
 onMounted(async () => {
   await store.fetchPorts()

@@ -61,6 +61,11 @@ export function logDataTransfer(portId: string | null, sizeInBytes: number, meta
 import { Request, Response, NextFunction } from 'express';
 
 export function trafficTrackingMiddleware(req: Request, res: Response, next: NextFunction): void {
+   // Skip OPTIONS requests (CORS preflight) - they don't need tracking and shouldn't interfere with CORS handling
+   if (req.method === 'OPTIONS') {
+    return next();
+  }
+
   const startTime = Date.now();
   let responseSize = 0;
 
