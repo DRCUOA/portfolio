@@ -1,12 +1,11 @@
-# Full-stack app with Express API and Vue 3 frontend
+# portfolio: API server + Vite frontend
 name = portfolio
 
 [api]
 cmd  = npm run dev:api
 port = 3000
-url  = http://localhost:3000/api
 
 [frontend]
-cmd  = npm run dev:frontend
+cmd  = npm run dev
 port = 5173
-url  = http://localhost:5173
+cwd  = frontend
