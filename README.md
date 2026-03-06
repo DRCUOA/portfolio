@@ -133,7 +133,9 @@ If no seed file is found, the database will be initialized empty and ready for m
 
 ### Public Portfolio Views
 
-- **Home Page** (`/`): Grid view of all partitions
+- **Home Page** (`/`): Grid view of all partitions with hero project search
+  - Search/filter projects by name on keyup
+  - Arrow Up/Down to navigate, Enter to select, Escape to close
 - **Partition Detail** (`/partitions/:slug`): Shows all projects in a partition with featured projects highlighted
 - **Project Detail** (`/projects/:slug`): Full project information with associated partitions
 - **App Store View** (`/apps/:slug`): App Store-style presentation with screenshot galleries
@@ -161,6 +163,8 @@ Full CRUD interface accessible at `/admin`:
 
 ### UI/UX Features
 
+- **Hero Project Search**: Index view search bar to quickly find and jump to any project
+  - Type to filter by project name; arrow keys to navigate; Enter to select
 - **Glassmorphism Design**: Modern glass-effect UI with smooth animations
 - **Dark/Light Theme**: Theme toggle with persistent storage
 - **Responsive Layout**: Mobile-first design that works on all screen sizes

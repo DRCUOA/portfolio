@@ -1,3 +1,22 @@
+## [1.1.11] - 2025-03-06
+
+### Added
+- Hero project search/selection bar on index view (PartitionList)
+- Filter projects by name on keyup with dropdown results
+- Arrow Up/Down keyboard navigation through filtered project list
+- Enter to select highlighted project and navigate; Escape to close dropdown
+
+### Changed
+- Centered logo, title, and hero search on index view
+- Index header layout uses flex with items-center for centered alignment
+
+### Technical Details
+- Projects fetched via store.fetchProjects() on mount for search data
+- Dropdown shows project name and tagline; selection navigates to /projects/:slug
+- Files updated: PartitionList.vue
+
+---
+
 ## [1.1.10] - 2025-12-01
 
 ### Changed
