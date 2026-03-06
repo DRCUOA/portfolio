@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "cohort": "c26",
+    "repo": "befly"
+  },
+  "summary": "One-sentence description of the atomic work (no commas, no 'and' — must be a single action)",
+  "problem_statement": "Why this work matters. Describe the problem or risk being addressed. No solutions here — focus on the gap, constraint, or failure mode.",
+  "in_scope": [
+    "First concrete deliverable or activity",
+    "Second deliverable",
+    "Third deliverable"
+  ],
+  "out_of_scope": [
+    "Explicitly excluded work item",
+    "Another excluded item"
+  ],
+  "requirements": [
+    "Testable requirement (atomic, verifiable)",
+    "Second requirement",
+    "Max 3–5 requirements"
+  ],
+  "acceptance_criteria": [
+    "Definition of done item 1",
+    "Definition of done item 2"
+  ],
+  "dependencies": [
+    "Prerequisite work, ticket, or access",
+    "Another dependency"
+  ],
+  "risks": [
+    "Known risk or unknown",
+    "Another risk"
+  ],
+  "implementation_notes": "Optional. Reference docs, patterns, or constraints. Bias toward concrete guidance over speculation."
+}

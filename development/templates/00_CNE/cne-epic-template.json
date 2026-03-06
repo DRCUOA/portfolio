@@ -1,0 +1,31 @@
+{
+  "title": "[EPIC]: Short Name — Directional subtitle describing strategic intent",
+  "label": "epic",
+  "summary": "One or two sentences capturing the strategic intent. What are we evolving, and why?",
+  "problem_hl": "High-level problem statement. Describe the user-facing or system-level pain in plain language. No solutions — focus on the gap, friction, or constraint.",
+  "problem_ll": "3",
+  "goals": [
+    "First desired outcome or design principle",
+    "Second outcome — be concrete and specific",
+    "Third outcome — prefer quality attributes over vague aspirations"
+  ],
+  "scope": [
+    "Phase 1: Core deliverables that unlock value earliest",
+    "Phase 2: Next priority deliverables",
+    "Phase 3: Further deliverables building on prior phases"
+  ],
+  "out_of_scope": [
+    "Work that might be assumed in-scope but is deliberately excluded",
+    "Another excluded item — explain briefly why if not obvious"
+  ],
+  "acceptance": [
+    "Measurable criterion (e.g. ≤5 visible controls in default view)",
+    "Observable behaviour (e.g. time to first keystroke <100ms)",
+    "Qualitative bar (e.g. platform feels still, not busy)"
+  ],
+  "child_issues": [
+    "P1-xxx-01 short name for first atomic issue",
+    "P1-xxx-02 short name for second atomic issue",
+    "P2-xxx-03 short name for third atomic issue"
+  ]
+}

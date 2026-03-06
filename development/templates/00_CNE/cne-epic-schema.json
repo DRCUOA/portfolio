@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://befly.dev/schemas/cne-epic.json",
+  "title": "CNE Epic",
+  "description": "Schema for epic JSON files consumed by the cne script (Create New Epic). An epic groups related atomic issues (CNIs) under a single strategic goal. Use this format exactly when creating new epics. Run: cne path/to/epic.json",
+  "type": "object",
+  "required": ["title", "label", "summary", "problem_hl", "goals", "scope", "acceptance"],
+  "additionalProperties": false,
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Epic title. Format: [EPIC]: <concise name> — <subtitle>. Keep the name under 10 words; the subtitle gives directional intent.",
+      "pattern": "^\\[EPIC\\]:.*",
+      "minLength": 12,
+      "maxLength": 200,
+      "examples": ["[EPIC]: Attention-First UIX — Incremental evolution toward distraction-free writing"]
+    },
+    "label": {
+      "type": "string",
+      "description": "GitHub label. Always 'epic' for this schema.",
+      "const": "epic"
+    },
+    "summary": {
+      "type": "string",
+      "description": "One or two sentences capturing the strategic intent of the epic. Should answer: what are we evolving, and why?",
+      "minLength": 10,
+      "maxLength": 500
+    },
+    "problem_hl": {
+      "type": "string",
+      "description": "High-level problem statement. Describe the user-facing or system-level pain in plain language. No solutions — focus on the gap, friction, or constraint.",
+      "minLength": 10
+    },
+    "problem_ll": {
+      "type": "string",
+      "description": "Low-level problem domain. Use one of: '1' (system only), '2' (user only), '3' (both system and user). Indicates whether the epic addresses architecture, user experience, or both.",
+      "enum": ["1", "2", "3"]
+    },
+    "goals": {
+      "type": "array",
+      "description": "Desired outcomes and design principles. Each item is a single, concrete goal or quality attribute the epic aims to deliver.",
+      "items": { "type": "string", "minLength": 3 },
+      "minItems": 2
+    },
+    "scope": {
+      "type": "array",
+      "description": "Phased delivery plan. Each item describes one phase with its deliverables. Order implies priority. Format each item as 'Phase N: description'.",
+      "items": { "type": "string", "minLength": 5 },
+      "minItems": 1
+    },
+    "out_of_scope": {
+      "type": "array",
+      "description": "Explicitly excluded work. Prevents scope creep. Each item names something that might be assumed in-scope but is deliberately deferred or omitted.",
+      "items": { "type": "string" }
+    },
+    "acceptance": {
+      "type": "array",
+      "description": "Definition of Done for the epic as a whole. Testable, observable criteria. Each item must be verifiable — prefer measurable thresholds over subjective statements.",
+      "items": { "type": "string", "minLength": 5 },
+      "minItems": 1
+    },
+    "child_issues": {
+      "type": "array",
+      "description": "Expected atomic issues (CNIs) that decompose this epic. Each item is a short identifier and description. Format: '<phase-prefix>-<seq> <short name>'. These become the basis for individual CNI files.",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "body": {
+      "type": "string",
+      "description": "Full markdown body for the GitHub issue. Auto-generated from the structured fields above. Sections: Epic Summary, High-Level Problem Statement, Low-Level Problem Statement, Goals / Outcomes, In Scope, Out of Scope, Definition of Done, Expected Child Atomic Issues. If omitted, the cne script will render it from the other fields."
+    }
+  }
+}

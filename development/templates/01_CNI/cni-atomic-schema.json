@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://befly.dev/schemas/cni-atomic.json",
+  "title": "CNI Atomic Issue",
+  "description": "Schema for atomic issue JSON files consumed by the cni script (Create Atomic Issue + Branch). Use this format exactly when creating new CNIs. Run: cni path/to/issue.json",
+  "type": "object",
+  "required": ["meta", "summary", "problem_statement"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "Repository context. Required by cni for workrepo lookup and branch creation.",
+      "required": ["cohort", "repo"],
+      "additionalProperties": false,
+      "properties": {
+        "cohort": {
+          "type": "string",
+          "description": "Cohort identifier (e.g. c26, c25). Passed to workrepo.",
+          "examples": ["c26"]
+        },
+        "repo": {
+          "type": "string",
+          "description": "Repository name. Passed to workrepo.",
+          "examples": ["befly"]
+        }
+      }
+    },
+    "summary": {
+      "type": "string",
+      "description": "One-sentence summary. Must be atomic: no commas, no 'and'. Single action only. Used as issue title prefix: [Atomic]: {summary}",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "problem_statement": {
+      "type": "string",
+      "description": "Why this work matters. Describe the problem, risk, or gap. No solutions — focus on the failure mode or constraint. 1–3 paragraphs.",
+      "minLength": 1
+    },
+    "in_scope": {
+      "type": "array",
+      "description": "Concrete deliverables or activities. Each item becomes a bullet under 'In Scope' in the GitHub issue body.",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "out_of_scope": {
+      "type": "array",
+      "description": "Explicitly excluded work. Prevents scope creep. Each item becomes a bullet under 'Out of Scope'.",
+      "items": { "type": "string" }
+    },
+    "requirements": {
+      "type": "array",
+      "description": "Testable, atomic requirements. Max 3–5. Each must be verifiable. Rendered under 'Requirements (Atomic, Testable)'.",
+      "items": { "type": "string" }
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "description": "Definition of Done. What must be true for this issue to close. Rendered under 'Acceptance Criteria (Definition of Done)'.",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "Prerequisites: other tickets, access, or completed work. Rendered under 'Dependencies'.",
+      "items": { "type": "string" }
+    },
+    "risks": {
+      "type": "array",
+      "description": "Known risks or unknowns. Rendered under 'Risks'.",
+      "items": { "type": "string" }
+    },
+    "implementation_notes": {
+      "type": "string",
+      "description": "Optional. Reference docs, patterns, file paths, or constraints. Bias toward concrete guidance. Rendered under 'Implementation Notes'."
+    }
+  }
+}
